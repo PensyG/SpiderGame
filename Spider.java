@@ -32,10 +32,6 @@ public class Spider {
             return false;
         return true;
     }
-    public double getLife() {
-        return life;
-    }
-
 
     public void move(int row, int col) {
         locationRow = row;
@@ -59,9 +55,7 @@ public class Spider {
                 Game.adjustScore(5);
                 flies.remove(fly);
             }
-
         }
-
     }
 
     public void update(ArrayList<Fly> flies) {
@@ -70,7 +64,6 @@ public class Spider {
         if (life > MAX_LIFE)
             life = MAX_LIFE;
     }
-
 
     /**
      * checks to see if the spider is in the element (i, j) in the web array
@@ -108,7 +101,6 @@ public class Spider {
         int currentCol;
 
         boolean inBounds;
-
 
         for (int i = 0; i < viewDiameter; i++) {
             for (int j = 0; j < viewDiameter; j++) {

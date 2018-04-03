@@ -1,0 +1,56 @@
+4 classes
+    Game
+    Fly
+    Spider
+    Web
+
+
+Game
+    Menu
+        Start
+            Game Controller
+                Turn based
+                    Update
+                        Fly
+                        Web
+                        Spider
+        Help
+            Display information about the game
+        Options
+            Difficulty
+                Spider view distance
+                Health
+            debug mode
+
+        Quit
+
+
+
+Web
+    int[][] array
+
+    METHODS
+
+        update
+            calculate elements
+        max distance between two elements
+
+Fly
+    ATTRIBUTES
+        health
+            - health of the fly, goes down over time, if it reaches 0 it dies
+        vibrate
+            - amount of energy the fly is vibrating the web, decreases by one for each element away (includes diagonal)
+        struggle
+            - percent chance each turn the fly has to escape
+        location
+            - row of web
+            - column of web
+
+    Method
+        struggle
+            attempt to get free from web
+        exhaust
+            loses health from vibrating / starve
+
+

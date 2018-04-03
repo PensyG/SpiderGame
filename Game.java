@@ -4,21 +4,22 @@ import java.util.Scanner;
 
 public class Game {
     private static Scanner keyboard = new Scanner(System.in);
-    private static int score;
+    private static int score;   //holds the score of the player
 
+    //Constants passed to displayText()
     private final static int HELP_MENU = 10;
     private final static int HELP_IN_GAME = 11;
 
     private final static int QUIT_DEATH = -1;
     private final static int QUIT_PLAYER = -2;
 
+    //will display additional information during game
     public static final boolean DEBUG = false;
 
     public static void main(String[] args) {
 
         String userInput;
         boolean continueMenu = true;
-
         do {
             System.out.print("Spider Game\n" +
                     "1. Start\n" +
