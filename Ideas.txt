@@ -12,28 +12,53 @@ Game
                 Turn based
                     Update
                         Fly
+                            Struggle
+                            GenerateFly
+                            Hunger
                         Web
+                            Change elements
+                        Player
+                            Get turn
+                                help (in-game)
+                                    displays info about movement
+                                move
+                                quit
                         Spider
-        Help
+                            eat (attempt)
+                            hunger
+                            set health
+        Help (menu)
             Display information about the game
-        Options
-            Difficulty
-                Spider view distance
-                Health
-            debug mode
-
+        OPTIONS
+            DIFFICULTY
+                EASY
+                    VIEW = 3
+                    HEALTH = 20
+                MEDIUM
+                    VIEW = 2
+                    HEALTH = 15
+                HARD
+                    VIEW = 1
+                    HEALTH = 10
+            debug
+                web
+                    display entire web
+                fly
+                    location
+                    health
+                    vibrate energy
+                    struggle chance
+                spider
+                    health
         Quit
-
-
 
 Web
     int[][] array
 
-    METHODS
-
-        update
-            calculate elements
-        max distance between two elements
+    update
+        calculate elements
+    max distance
+        between two elements (includes diagonal)
 
 Fly
     ATTRIBUTES
@@ -47,10 +72,12 @@ Fly
             - row of web
             - column of web
 
-    Method
-        struggle
-            attempt to get free from web
-        exhaust
-            loses health from vibrating / starve
+    struggle
+        attempt to get free from web
+    EXHAUST
+        LOSE HEALTH FROM STARVING (STRUGGLING)
+
+Spider
+    Movement
 
 

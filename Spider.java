@@ -18,6 +18,9 @@ public class Spider {
         hungerConstant = webLength / 50;
     }
 
+    /**
+     * Subtract health from the spider
+     */
     private void hunger() {
         life -= hungerConstant;
     }
@@ -44,7 +47,6 @@ public class Spider {
      *
      * @param flies
      */
-
     private void eat(ArrayList<Fly> flies) {
         Fly fly;
         for (int i = 0; i < flies.size(); i++) {
