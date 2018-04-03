@@ -10,6 +10,7 @@ public class Game {
     private final static int HELP_MENU = 10;            //
     private final static int HELP_IN_GAME = 11;         //
 
+
     private final static int QUIT_DEATH = -1;           //
     private final static int QUIT_PLAYER = -2;          //
 

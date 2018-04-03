@@ -5,27 +5,41 @@
     Web
 
 Game
+    constants
+        help
+            menu
+            in-game
+        quit
+            death
+            user
+    display score
+    display text
     Menu
         Start
-            Game Controller
-                Turn based
-                    Update
-                        Fly
-                            Struggle
-                            GenerateFly
-                            Hunger
-                        Web
-                            Change elements
-                        Player
-                            Get turn
-                                help (in-game)
-                                    displays info about movement
-                                move
-                                quit
-                        Spider
-                            eat (attempt)
-                            hunger
-                            set health
+            setupGame
+                create objects
+                Game Controller
+                    Turn based
+                        score
+                            add some each turn (survival)
+                        update
+                            Fly
+                                Struggle
+                                GenerateFly
+                                Hunger
+                            Web
+                                Change elements
+                            Player
+                                Get turn
+                                    help (in-game)
+                                        displays info about movement
+                                    move
+                                    quit
+                            Spider
+                                eat (attempt)
+                                    add to score
+                                hunger
+                                set health
         Help (menu)
             Display information about the game
         OPTIONS
@@ -52,12 +66,14 @@ Game
         Quit
 
 Web
-    int[][] array
+    attributes
+        web length
+        int[][] array
+            [web length][web length]
     update
         calculate elements
     max distance
         between two elements (includes diagonal)
-
 Fly
     class constants
         max size
@@ -83,6 +99,30 @@ Fly
         LOSE HEALTH FROM STARVING (STRUGGLING)
 
 Spider
+    class constants
+        max view
+            the view distance of the spider
+        max life
+            the maximum amount of life the spider can have
+        max movement
+            the maximum amount of space the spider can move each turn
+    attributes
+        life
+            health of the spider, gains it by eating flies, loses it each turn
+        location
+            column
+            row
+        hungerValue
+            amount of health that goes down
     Movement
+        8 directional
+            up, down, left, right, (+ diagonals)
+    view
+        view of the web vibration values around the spider of max_view radius
+    eat
+        consume flies
+            gain health
+
+
 
 
