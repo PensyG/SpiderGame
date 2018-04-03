@@ -1,16 +1,3 @@
-//name: Penny Grant/Reece Sharp
-//date: 
-//project:
-/*
- * BUGS:
- *
- */
-
-/*
- * IDEAS: if a fly escapes, say the cardinal direction it left in relative to the spider
- *
- */
-
 import java.util.ArrayList;
 
 public class Web {
@@ -20,6 +7,16 @@ public class Web {
     public Web(int x) {
         webLength = x;
         web = new int[webLength][webLength];
+    }
+
+    /**
+     * Checks if index sent is within the between 0 - (webLength - 1)
+     * @param i - row of the web array
+     * @param j - column of the web web array
+     * @return if (i, j) is inside of the bounds of the web array
+     */
+    public boolean checkBounds(int i, int j) {
+        return (0 <= i && 0 <= j) && (i < webLength && j < webLength);
     }
 
     /**
@@ -44,7 +41,10 @@ public class Web {
      * @param j - Col of the index
      * @param vibration - power of the vibration, higher values mean more vibrations
      */
-    private void setIndex(int i, int j, int vibration) {
+    private void setVibration(int i, int j, int vibration) {
+        if (vibration < 0)
+            vibration = 0;    //vibration value
+
         web[i][j] = vibration;
     }
 
@@ -69,7 +69,7 @@ public class Web {
      */
     private void calculateElements(ArrayList<Fly> flies) {
         //define
-        ArrayList<Integer> energyArray = new ArrayList<>(); //array of fly vibration at location
+        ArrayList<Integer> vibrateArray = new ArrayList<>(); //array of fly vibration at location
         int flyRow;               //current fly row
         int flyCol;              //current fly column
         int flyEnergy;          //energy of each fly, based on size of web, and size of fly
@@ -83,34 +83,46 @@ public class Web {
             for (int j = 0; j < webLength; j++) {
 
                 //each fly in array
-                for (int k = 0; k < flies.size(); k++) {
+                for (Fly fly : flies) {
                     //get location and energy of specific fly
-                    flyRow = flies.get(k).getRow();
-                    flyCol = flies.get(k).getCol();
-                    flyEnergy = flies.get(k).getEnergy();
+                    flyRow = fly.getRow();
+                    flyCol = fly.getCol();
+                    flyEnergy = fly.getEnergy();
 
                     //distance of specific fly to element
-                    distance = getDistance(i, j, flyRow, flyCol);
+                    distance = getMaxDistance(i, j, flyRow, flyCol);
 
                     vibration = flyEnergy - distance;      //power of vibration from fly to element
-                    energyArray.add(vibration);         //add vibration value to array
+                    vibrateArray.add(vibration);         //add vibration value to array
                 }
 
                 //find greatest vibration value at this element, clears after running through
-                if (energyArray.size() > 0) {
-                    for (int p : energyArray)
-                        if (p > vibration)
-                            vibration = p;
-                    energyArray.clear();
+                if (vibrateArray.size() > 0) {
+                    for (int e : vibrateArray)
+                        if (e > vibration)
+                            vibration = e;
+                    vibrateArray.clear();
                 }
-
                 //update vibrations in each element
-                if (vibration > 0)
-                    setIndex(i, j, vibration);    //vibration value
-                else
-                    setIndex(i, j, vibration = 0);          //outside of vibration zone
+                setVibration(i, j, vibration);
             }
         }
+    }
+
+    /**
+     * Calculates the amount of elements between (i, j) and (x, y), including diagonals
+     *
+     * @param i - Row of index
+     * @param j - Column of index
+     * @param x - row of element
+     * @param y - column of element
+     * @return the distance between two elements, any int < webLength
+     */
+    private int getMaxDistance(int i, int j, int x, int y) {
+        int differenceX = Math.abs(x - i);        //difference in location row with current row 'i'
+        int differenceY = Math.abs(y - j);        //difference in location column with current column 'j'
+
+        return Math.max(differenceX, differenceY); //return which is larger, the row, or the column
     }
 
     /**
@@ -143,7 +155,7 @@ public class Web {
 
             //format what char to display in console
             for (int j = 0; j < webLength; j++) {
-                if (spider.checkSpider(i, j))
+                if (spider.isSpider(i, j))
                     System.out.print(String.format("%-" + formatLength + "s ", "*"));
                 else
                     System.out.print(String.format("%-" + formatLength + "d ", getVibration(i, j)));
@@ -154,30 +166,4 @@ public class Web {
         System.out.println();
     } //end method
 
-    /**
-     * Calculates the amount of elements between (i, j) and (x, y), including diagonals
-     *
-     * @param i - Row of index
-     * @param j - Column of index
-     * @param x - row of element
-     * @param y - column of element
-     * @return the distance between two elements, any int < webLength
-     */
-    public int getDistance(int i, int j, int x, int y) {
-        int differenceX = Math.abs(x - i);        //difference in location row with current row 'i'
-        int differenceY = Math.abs(y - j);        //difference in location column with current column 'j'
-
-        return Math.max(differenceX, differenceY); //return which is larger, the row, or the column
-    }
-
-    /**
-     * Checks if index sent is within the between 0 - (webLength - 1)
-     * @param i - row of the web array
-     * @param j - column of the web web array
-     * @return if (i, j) is inside of the bounds of the web array
-     */
-    public boolean checkBounds(int i, int j) {
-        return (0 < i && 0 < j) && (i < webLength && j < webLength);
-    }
-
-}//end of class
+}
