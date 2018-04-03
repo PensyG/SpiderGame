@@ -4,22 +4,26 @@ import java.util.Scanner;
 
 public class Game {
     private static Scanner keyboard = new Scanner(System.in);
-    private static int score;   //holds the score of the player
+    private static int score;                           //holds the score of the player
 
     //Constants passed to displayText()
-    private final static int HELP_MENU = 10;
-    private final static int HELP_IN_GAME = 11;
+    private final static int HELP_MENU = 10;            //
+    private final static int HELP_IN_GAME = 11;         //
 
-    private final static int QUIT_DEATH = -1;
-    private final static int QUIT_PLAYER = -2;
+    private final static int QUIT_DEATH = -1;           //
+    private final static int QUIT_PLAYER = -2;          //
 
     //will display additional information during game
-    public static final boolean DEBUG = false;
+    public static final boolean DEBUG = false;          //
 
+    /**
+     *
+     * @param args
+     */
     public static void main(String[] args) {
 
-        String userInput;
-        boolean continueMenu = true;
+        String userInput;               //
+        boolean continueMenu = true;    //
         do {
             System.out.print("Spider Game\n" +
                     "1. Start\n" +
@@ -107,6 +111,12 @@ public class Game {
         //go back to main menu
     }
 
+    /**
+     *
+     * @param web
+     * @param spider
+     * @param flies
+     */
     public static void gameController(Web web, Spider spider, ArrayList<Fly> flies) {
 
 
@@ -130,7 +140,7 @@ public class Game {
             if (!spider.alive())
                 action = QUIT_DEATH;
 
-            //continue game
+            //continue game (positive values are continues, allows for custom information)
             if (action >= 0) {
                 spider.update(flies);
                 System.out.println("-------------");    //separate each turn
@@ -182,6 +192,12 @@ public class Game {
         return action;
     }
 
+    /**
+     *
+     * @param spider
+     * @param web
+     * @param flies
+     */
     public static void objectUpdate(Spider spider, Web web, ArrayList<Fly> flies) {
         //Fly update
         Fly.update(web);
@@ -202,6 +218,10 @@ public class Game {
         return isDigit;
     }
 
+    /**
+     *
+     * @param adjust
+     */
     public static void adjustScore(int adjust) {
         score += adjust;
     }

@@ -1,18 +1,21 @@
 import java.util.ArrayList;
 import java.util.Random;
 
+/**
+ *
+ */
 public class Fly {
     private static Random random = new Random();
-    private static final int MAXSIZE = 5;          // max size fly, can be (0-8)
-    private static final int TURN_GEN = 4;
-    private static final int MAX_FLIES = 10;
-    private static ArrayList<Fly> flies = new ArrayList<>();
+    private static final int MAXSIZE = 5;                       // max size fly, should be 0-8 (but can be any)
+    private static final int TURN_GEN = 4;                      //
+    private static final int MAX_FLIES = 10;                    //
+    private static ArrayList<Fly> flies = new ArrayList<>();    //
 
-    private int locationRow;          //row of fly
-    private int locationCol;          //column of fly
-    private int vibrateEnergy;      //energy of the fly is based on web size, used in Web.vibrate()
-    private int size;               //size of fly, larger = more energy given
-    private static double struggleChance;  //percent per turn fly has to get out, linear chance based on webSize
+    private int locationRow;                //row of fly
+    private int locationCol;                //column of fly
+    private int vibrateEnergy;              //energy of the fly is based on web size, used in Web.vibrate()
+    private int size;                       //size of fly, larger = more energy given
+    private static double struggleChance;   //percent per turn fly has to get out, linear chance based on webSize
 
     /**
      *
@@ -28,26 +31,50 @@ public class Fly {
         struggleChance = (double) 1 / webSize;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getRow() {
         return locationRow;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getCol() {
         return locationCol;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getEnergy() {
         return vibrateEnergy;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getSize() {
         return size;
     }
 
+    /**
+     *
+     * @return
+     */
     public static ArrayList<Fly> getFlies() {
         return flies;
     }
 
+    /**
+     *
+     * @return
+     */
     public static int getMaxEnergy() {
         int maxEnergy = 0;
         for (Fly fly : flies) {
@@ -72,6 +99,10 @@ public class Fly {
         return false;
     }
 
+    /**
+     *
+     * @param web
+     */
     public static void update(Web web) {
         //attempt to generate a fly
         if (random.nextInt(TURN_GEN) == 0)
@@ -90,6 +121,10 @@ public class Fly {
             debug();
     }
 
+    /**
+     *
+     * @return
+     */
     public boolean struggleFree() {
         //if the random number is lower than the struggleChance, then the fly is free
         if (random.nextDouble() < struggleChance) {

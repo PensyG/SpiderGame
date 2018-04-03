@@ -1,13 +1,13 @@
 import java.util.ArrayList;
 
 public class Spider {
-    private static int MAX_VIEW = 3;
-    private static int MAX_MOVEMENT;
-    private final int MAX_LIFE;     //currentLife can never be above this value
-    private double life;               //Spider health, if it reaches 0, game over
-    private int locationRow;        //row of spider
-    private int locationCol;        //column of spider
-    private double hungerConstant;
+    private static int MAX_VIEW = 3;    //
+    private static int MAX_MOVEMENT;    //
+    private final int MAX_LIFE;         //currentLife can never be above this value
+    private double life;                //Spider health, if it reaches 0, game over
+    private int locationRow;            //row of spider
+    private int locationCol;            //column of spider
+    private double hungerConstant;      //
 
     public Spider(int webLength) {
         MAX_MOVEMENT = webLength / 10;
@@ -36,6 +36,11 @@ public class Spider {
         return true;
     }
 
+    /**
+     *
+     * @param row
+     * @param col
+     */
     public void move(int row, int col) {
         locationRow = row;
         locationCol = col;
@@ -60,6 +65,10 @@ public class Spider {
         }
     }
 
+    /**
+     *
+     * @param flies
+     */
     public void update(ArrayList<Fly> flies) {
         eat(flies);
         hunger();
@@ -252,6 +261,10 @@ public class Spider {
         return newElement;
     }
 
+    /**
+     *
+     * @param web
+     */
     public void debug(Web web) {
         System.out.println("Debug: SPIDER");
         System.out.printf("ROW: %d, COLUMN: %d, HEALTH: %3.1f, MOVEMENT: %d%n",

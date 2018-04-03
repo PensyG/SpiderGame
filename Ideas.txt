@@ -4,7 +4,6 @@
     Spider
     Web
 
-
 Game
     Menu
         Start
@@ -54,14 +53,21 @@ Game
 
 Web
     int[][] array
-
     update
         calculate elements
     max distance
         between two elements (includes diagonal)
 
 Fly
-    ATTRIBUTES
+    class constants
+        max size
+            maximum size a fly can be, influences vibration value and nutrient amount
+        turn generation
+        1 / (turn gen) percent chance to generate a fly
+        max flies
+            max amount of flies that the web can hold
+
+    attributes
         health
             - health of the fly, goes down over time, if it reaches 0 it dies
         vibrate
@@ -71,7 +77,6 @@ Fly
         location
             - row of web
             - column of web
-
     struggle
         attempt to get free from web
     EXHAUST

@@ -1,8 +1,11 @@
 import java.util.ArrayList;
 
+/**
+ *
+ */
 public class Web {
-    private int[][] web;    //square web array of webLength length
-    private int webLength;  //length of web array
+    private int[][] web;                //square web array of webLength length
+    private int webLength;              //length of web array
 
     public Web(int x) {
         webLength = x;
@@ -131,7 +134,6 @@ public class Web {
      * @param spider - Spider object, used in showing the location of the spider in web
      */
     private void debug(Spider spider) {
-        //define
         int formatLength;   //dynamic web display formatter
 
         System.out.println("DEBUG: Web");
@@ -165,5 +167,4 @@ public class Web {
         } //end row
         System.out.println();
     } //end method
-
 }
