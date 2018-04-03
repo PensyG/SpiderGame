@@ -14,173 +14,143 @@
  *
  */
 
-import java.util.Scanner;
+import java.util.ArrayList;
 
 public class Spider {
-    //private final int MAX_MOVEMENT = 5;
-    private final int MAX_LIFE = Calculate.SPIDER_LIFE;   //currentLife can never be above this value
-    private final int MAX_MOVEMENT = Calculate.SPIDER_MOVEMENT_DISTANCE;
-    private int currentLife;                        //Spider health, if it reaches 0, game over
-    private int locationX;                          //row of spider
-    private int locationY;                          //column of spider
-
-    private static Scanner keyboard = new Scanner(System.in);      //user input
-
+    private static int MAX_MOVEMENT;
+    private final int MAX_LIFE;     //currentLife can never be above this value
+    private int life;               //Spider health, if it reaches 0, game over
+    private int locationRow;        //row of spider
+    private int locationCol;        //column of spider
+    private int hungerConstant;
 
     public Spider(int webLength) {
-        currentLife = MAX_LIFE;
-        locationX = webLength / 2;
-        locationY = webLength / 2;
+        MAX_MOVEMENT = webLength / 10;
+        MAX_LIFE = webLength / 2;
+        life = MAX_LIFE;
+        locationRow = webLength / 2;
+        locationCol = webLength / 2;
+        hungerConstant = webLength / 50;
     }
 
-    public int getX() {
-        return locationX;
+    public int getRow() {
+        return locationRow;
     }
 
-    public int getY() {
-        return locationY;
+    public int getCol() {
+        return locationCol;
     }
 
-    public int getHealth() {
-        return currentLife;
+
+    public static boolean checkDistance(int movement) {
+        return (movement <= MAX_MOVEMENT) && (movement > 0);
+    }
+
+    private void hunger() {
+        life -= hungerConstant;
     }
 
     /**
-     * called if in an element with a fly, consumes fly and adds life
+     * Checks if a fly is
      *
-     * @param fly
+     * @param flies
      */
-    public void eatFly(Fly fly) {
-        //might need to call the web.checkElement()
-        //and the flies array to remove it
-        currentLife += fly.getEnergy();
-        if (currentLife > MAX_LIFE)
-            currentLife = MAX_LIFE;
+    private void eat(ArrayList<Fly> flies) {
+        Fly fly;
+        for (int i = 0; i < flies.size(); i++) {
+            fly = flies.get(i);
+            if (fly.getRow() == locationRow && fly.getCol() == locationCol) {
+                life += fly.getEnergy();
+                if (life > MAX_LIFE)
+                    life = MAX_LIFE;
+            }
+
+        }
+
     }
 
     /**
-     * checks the health of the spider
+     * checks the health of the spider, if at, or below 0, the game ends
+     *
      * @return
      */
     public boolean alive() {
-        if (currentLife <= 0)
+        if (life <= 0)
             return false;
         return true;
+    }
+
+    /**
+     * iterates the characteristics of the spider, is called each turn
+     *
+     * @param web
+     * @param flies
+     */
+    public void update(Web web, ArrayList<Fly> flies) {
+
+        if (alive()) {
+            System.out.printf("Life: %3d, Max Movement: %d%n", life, MAX_MOVEMENT);
+            hunger();   //subtract life from spider
+        }
+    }
+
+    /**
+     * generates a square of view around the spider, of SPIDER_VIEW radius
+     *
+     * @param web -
+     */
+    public void generateSpiderView(Web web) {
+        final int viewRadius = 3; //radius of elements out from the spider that it can feel (1-3 work well)
+        final int viewDiameter = (viewRadius * 2) + 1; //diameter of the view circle
+        int formatLength = String.valueOf(Fly.getMaxEnergy()).length(); //formats the width of the spaces
+        int diameterCounter = 0;    //used for displaying the dimensions of the viewDiameter
+
+        for (int i = 0; i < web.getWebLength(); i++) {
+            for (int j = 0; j < web.getWebLength(); j++) {
+                //is spot is spider
+                if (checkSpider(i, j)) {
+                    System.out.print(String.format("%-" + formatLength + "s ", "*"));
+                    diameterCounter++;
+                }
+                //get local energies
+                else if (web.getDistance(i, j, this.getRow(), this.getCol()) <= viewRadius) {
+                    System.out.print(String.format("%-" + formatLength + "d ", web.getVibration(i, j)));
+                    diameterCounter++;
+                }
+
+                //format the viewing square around the spider
+                if (viewDiameter - diameterCounter == 0) {
+                    System.out.println();
+                    diameterCounter = 0;
+                }
+            }
+        }
+    }
+
+    /**
+     * checks to see if the spider is in the element (i, j) in the web array
+     *
+     * @param i - the row of the array
+     * @param j - the column of the array
+     */
+    public boolean checkSpider(int i, int j) {
+        return i == locationRow && j == locationCol;
     }
 
     /**
      * Checks for valid user entry (in bounds of the array), and then adjusts the spider's position.
      * Can move in 8 directions, but only in that direction once per turn. In addition, there is a cap
      * far the spider can move in that turn
-     *
+     * <p>
      * Input example: wa11, which means up-left, 11 spaces
      * Input possible commands: [(w, a, s, d) (1-MAX_MOVEMENT)]
-     *
+     * <p>
      * The commands should also be able to be entered backwards, the method should plug into a switch
      * statement to see if the command was valid, then throw that to a in-range checker to make sure it's still
      * within the web indexes
      */
-    public void move(Web web, String userInput) {
-
-
-        final char UP = 'w';
-        final char DOWN = 's';
-        final char LEFT = 'a';
-        final char RIGHT = 'd';
-
-        int index;
-
-        int changeX = 0;    //change in row index
-        int changeY = 0;    //change in column index
-
-        String stringDirection;    //gets the first occurrence of a direction (letters)
-        String stringDistance;     //gets firs occurrence of a distance (number)
-        boolean hasDirection;  //checks that user input has a direction
-        boolean hasDistance;   //checks that user input has a distance
-        char value;
-        int distance;   //i
-
-
-        boolean moved = false;  //flag for successful input
-        while (!moved) {
-
-            System.out.print("Spider Movement: ");
-            userInput = keyboard.nextLine().toLowerCase();
-
-            //reset flags
-            hasDirection = false;
-            hasDistance = false;
-            stringDirection = "";
-            stringDistance = "";
-            index = 0;
-
-            /*
-            Hardcoded, we know the first input should be a direction.
-            The second character is either another direction (diagonal), also != to first
-            The third should either be a whiteSpace, or a distance (int)
-            After that, continue to check if there are more distance values,
-            as the move distance can be more than a single digit can provide (13)
-             */
-            if (userInput.length() >= 2) {
-                if (Character.isAlphabetic(userInput.charAt(index)))
-                {
-                    stringDirection += userInput.charAt(index);
-                    index++;
-                    hasDirection = true;
-                    if (Character.isAlphabetic(userInput.charAt(index))
-                            && userInput.charAt(index) != userInput.charAt(index - 1)) {
-                        stringDirection += userInput.charAt(index);
-                        index++;
-                    }
-                    if (Character.isWhitespace(userInput.charAt(index))) {
-                        index++;
-                    }
-                    if (Character.isDigit(userInput.charAt(index))) {
-                        hasDistance = true;
-                        while (index < userInput.length() && Character.isDigit(userInput.charAt(index))) {
-                            stringDistance += Integer.toString(userInput.charAt(index) - '0');
-                            index++;
-                        }
-                    }
-                }
-            }
-
-            //Successfully split up the values,
-            if (hasDirection && hasDistance) {
-                distance = Integer.parseInt(stringDistance);
-                if (distance > 0 && distance <= MAX_MOVEMENT) {
-                    for (int i = 0; i < stringDirection.length(); i++) {
-                        value = stringDirection.charAt(i);
-                        switch (value) {
-                            case UP:
-                                changeX -= distance;
-                                break;
-                            case DOWN:
-                                changeX += distance;
-                                break;
-                            case RIGHT:
-                                changeY += distance;
-                                break;
-                            case LEFT:
-                                changeY -= distance;
-                                break;
-                        }
-                    }
-                    //check that changes are in range
-                    if (Calculate.checkBounds(web, locationX+changeX, locationY+changeY)) {
-                        //NOTE: needs to changed to check bounds
-                        locationX += changeX;
-                        locationY += changeY;
-                        moved = true;
-                    }
-                    else
-                        System.out.println("Error: Out of Web");
-                }
-                else
-                    System.out.println("Invalid distance");
-            }
-            else
-                System.out.println("Invalid entry");
-        }//end while
-    }//end method
-}//end of class
+    public void move(int row, int col) {
+        locationRow = row;
+        locationCol = col;
+    }
+}

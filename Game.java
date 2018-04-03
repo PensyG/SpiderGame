@@ -25,102 +25,256 @@
  *
  */
 
-import java.util.ArrayList;
-import java.util.Random;
 import java.util.Scanner;
 
 /**
  * Organizes the spider game, the player controls the spider, and moves around
  * their web trying to eat the flies before they die, until the spider dies
- * Goal for the program is to be completely dynamic, based on the user input size
- * of the web (above 10 or so, below that and methods don't function as they should)
+ * Goal for the program is to be completely dynamic, based on web size (50 min)
  */
 public class Game {
-    private static final int FLY_TURN_GEN = Calculate.FLY_TURN_GEN; //after 'X' amount of turns, generate a fly
-    private static Scanner keyboard = new Scanner(System.in);      //user input
-    private static Random random = new Random();                   //random gen for web, and fly gen
+    public static final boolean DEBUG = false;   //calls debug methods in each object update method if true
+
+    public static Scanner keyboard = new Scanner(System.in);      //user input
+
+    //Game constants
+    private static final int CHOICE_INVALID = 0;   //choice is invalid, reiterate
+    private static final int CHOICE_EXIT = 2;       //user wants to exit
+    private static final int CHOICE_MOVE = 3;       //user wants to, and has a valid move
+
+    private static final int EXIT_DEATH = 1;        //spider died
 
     public static void main(String[] args) {
 
-        int webLength;      //size of the web
+        int webLength = 0;      //size of the web
 
-        //user gen for web
-        System.out.println("Enter an integer for a web size, or -1 for a random size (20 is a good number)");
-        webLength = keyboard.nextInt();
-        keyboard.nextLine();    //clear input stream
+        //web generation
+        System.out.print("Web sizes:\n" +
+                "1: 50x50\n" +
+                "2: 100x100\n" +
+                "3: 200x200\n");
 
-        //random square size between 50-300 in multiples of 10
-        if (webLength < 0)
-            webLength = random.nextInt((25) * 10) + 50;
+        boolean valid = false;
+        while (!valid) {
+
+            System.out.println("Enter 1, 2, or 3");
+            webLength = keyboard.nextInt();
+            keyboard.nextLine();
+
+            if (webLength >= 1 && webLength <= 3)
+                valid = true;
+            else
+                System.out.println("Invalid Entry.");
+        }
+        switch (webLength) {
+            case 1:
+                webLength = 50;
+                break;
+            case 2:
+                webLength = 100;
+                break;
+            case 3:
+                webLength = 200;
+                break;
+        }
 
         //Generate objects in game
         Web web = new Web(webLength);
         Spider spider = new Spider(webLength);
-        Fly.flies = new ArrayList<>();
 
         //start game
         gameController(spider, web);
+
     }//end main
 
+    /**
+     * Controls the flow of the game
+     * @param spider - Spider object, needed to call turn updates
+     * @param web - Web object, needed to call turn updates
+     */
     private static void gameController(Spider spider, Web web) {
-        int time = 1;       //amount of turns of game
-        String userInput = "";
+        int time = 0;       //amount of turns of game
+        int quitValue;      //flag for custom exit message
+        int userAction;         //flag for userInput (move, exit)
+        String userInput;
 
-        while (userInput != "quit") {
+        System.out.println("Enter 'quit', or 'exit' at anytime to leave the game");
 
-            //NOTE:
+        //start with a fly in the web
+        Fly.generateFly(web);
 
-            System.out.println("Time: " + time);
-
-            //fly iteration checks
-            Fly.struggleFree();
-            Calculate.debugFlies();
-
-            //*********
-            //web iteration checks
-            Calculate.calculateElements(web);
-            //Calculate.debugWeb(web, spider);    //shows entire web, can be slow in webs wider than 50
-
-            //*********
-            //spider iteration checks/
-            System.out.println("Health: " + spider.getHealth());
-            Calculate.generateSpiderView(web, spider);
-
-            //if (userInput != "quit")
-            spider.move(web, userInput);
-
-            //if ()                         //test if in fly location to consume
-            //spider.eatFly()
-
-            //add fly to web
-            if (time % FLY_TURN_GEN == 0)
-                generateFly(web, spider);
+        quitValue = CHOICE_INVALID;
+        while (quitValue == CHOICE_INVALID) {
             time++;
+            System.out.println("Turn: " + time);
+
+            //increment objects
+            Fly.update(web);
+            web.update(spider, Fly.getFlies());
+
+            //player turn
+            spider.generateSpiderView(web);
+            do {
+                System.out.print("Spider Action: ");
+                userInput = Game.keyboard.nextLine();
+                userAction = Game.checkInput(userInput, spider, web);
+            } while (userAction == CHOICE_INVALID);
+
+            spider.update(web, Fly.getFlies());
+
+            if (userAction == CHOICE_EXIT)
+                quitValue = CHOICE_EXIT;
+            else if (!spider.alive())
+                quitValue = EXIT_DEATH;
+
             System.out.println("End Turn.\n" +
                     "--------------------\n");
+        }
+        displayEnd(quitValue);
+    }
+
+    /**
+     * displays the method of game quit (death, user exit, etc)
+     * @param quitValue
+     */
+    private static void displayEnd(int quitValue) {
+        switch (quitValue) {
+            case EXIT_DEATH:
+                System.out.println("Spider has died");
+                break;
+            case CHOICE_EXIT:
+                System.out.println("Goodbye!");
+                break;
         }
     }
 
     /**
-     * Generates a fly in a currently unoccupied space
-     *
-     * @param web    - Web object, is used for it's array and checking capability
-     * @param spider - object, passed into the web checking
+     * Checks the input to see if it's movement, or if it's a user quit.
+     * Will refactor to break it up, but just wanted to get the thing working
+     * @param userInput
+     * @param spider
+     * @param web
+     * @return
      */
-    private static void generateFly(Web web, Spider spider) {
-        int x;  //row
-        int y;  //column
+    public static int checkInput(String userInput, Spider spider, Web web) {
+        int choice = CHOICE_INVALID;
+        userInput = (userInput.toLowerCase()).trim();  //standardize input
 
-        boolean generated = false;
+        if (userInput.equals("quit") || userInput.equals("exit")) {
+            choice = CHOICE_EXIT;
+        } else {
+            int numSpaces = 0;
 
-        //gen random locations until empty spot is found, then add fly there
-        while (!generated) {
-            x = random.nextInt(web.getWebLength());
-            y = random.nextInt(web.getWebLength());
-            if (Calculate.checkElement(x, y, spider) == 0) {
-                Fly.flies.add(new Fly(web.getWebLength(), x, y));
-                generated = true;
+            //get # of spaces (should only be one between direction and distance)
+            for (int i = 0; i < userInput.length(); i++)
+                if (Character.isWhitespace(userInput.charAt(i)))
+                    numSpaces++;
+
+            if (numSpaces == 1) //Valid: 'ds 3', Invalid: 'w  4'
+            {
+                //split the String up into direction, and distance
+                String[] input;     //array of direction and distance;
+                input = userInput.split(" ");
+
+                int changeRow = 0;
+                int changeCol = 0;
+
+                boolean hasDistance;
+                boolean hasDirection = true;
+
+                //FIRST STRING (alphabetical)
+                char[] chars = input[0].toCharArray();
+                //can only be a max of 2 (diagonal directions), or 1 (cardinal directions)
+                if (chars.length <= 2) {
+                    for (char c : chars) {
+                        switch (c) {
+                            case 'w':
+                                changeRow -= 1;
+                                break;
+                            case 's':
+                                changeRow += 1;
+                                break;
+                            case 'a':
+                                changeCol -= 1;
+                                break;
+                            case 'd':
+                                changeCol += 1;
+                                break;
+                            default:
+                                hasDirection = false;   //not a valid direction (WASD)
+                                break;
+                        }
+                    }
+                    //duplicate directions (dd = 2)
+                    if (Math.abs(changeRow) == 2 || Math.abs(changeCol) == 2)
+                        hasDirection = false;
+                        //conflicting inputs (ws or ad)
+                    else if (changeRow == 0 && changeCol == 0)
+                        hasDirection = false;
+                }
+                //not 1 or 2 directional inputs (0, or 3+)
+                else
+                    hasDirection = false;
+
+                //SECOND STRING (numerical)
+
+                //attempt to convert the String to an int, not valid if fails
+                int distance = 0;
+                try {
+                    distance = Integer.parseInt(input[1]);
+                } catch (NumberFormatException e) {
+                    System.out.println("Invalid Distance");
+                }
+                //compare to MAX_MOVEMENT if try was successful
+                if (distance != 0 && Spider.checkDistance(distance))
+                    hasDistance = true;
+                else
+                    hasDistance = false;
+
+                //if both valid direction, and distance
+                if (hasDistance && hasDirection) {
+                    changeRow = 0;
+                    changeCol = 0;
+                    for (char c : chars) {
+                        switch (c) {
+                            case 'w':
+                                changeRow -= distance;
+                                break;
+                            case 's':
+                                changeRow += distance;
+                                break;
+                            case 'a':
+                                changeCol -= distance;
+                                break;
+                            case 'd':
+                                changeCol += distance;
+                                break;
+                        }
+                    }
+                    int newRow = spider.getRow() + changeRow;
+                    int newCol = spider.getCol() + changeCol;
+                    //check that changes are in range
+                    if (web.checkBounds(newRow, newCol)) {
+                        spider.move(newRow, newCol);
+                        choice = CHOICE_MOVE;   //successful move
+                    }
+                    else
+                        System.out.println("Out of bounds");
+                }
+                else
+                    System.out.println("Invalid entry");
             }
+            else
+                System.out.println("Too many spaces in entry.");
         }
-    }//end class
+        return choice;
+    }
+
+    /**
+     * Checks if the spider movement is valid (contains a direction, and a distance)
+     * The direction can be in WASD, and a 2 directional
+     * The distance needs to be less than, or equal to the spider MAX_MOVEMENT
+     * @param input - da
+     * @return
+     */
 }
