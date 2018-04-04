@@ -9,7 +9,7 @@ public class Fly {
     private static Random random = new Random();
     private static ArrayList<Fly> flies = new ArrayList<>();    //Fly array
 
-    private static final int MAX_SIZE = 3;                       // max size fly, should be 0-8 (but can be any)
+    private static final int MAX_SIZE = 3;                      // max size fly, should be 0-8 (but can be any)
     private static final int TURN_GEN = 4;                      //
     private static final int MAX_FLIES = 10;                    //
     private static final int MAX_HEALTH = 10;                   //the maximum amount of health a fly can have
@@ -20,7 +20,7 @@ public class Fly {
     private int size;                       //size of fly, larger = more energy given
     private int health;                     //health value of the fly, if it reaches 0, fly dies
     private int struggleChance;             //percent per turn fly has to get out, linear chance based on webSize
-    private int hungerConstant;
+    private int hungerConstant;             //constant that is taken from health each turn (higher for larger flies?)
 
     /**
      * @param webSize      - Size of the web being played on
@@ -34,6 +34,7 @@ public class Fly {
         vibrateEnergy = (webSize / 2 + (webSize / 50) * size);      //vibrate more the larger the size
         struggleChance = 10 - size;                                //larger flies have easier time escaping
         health = MAX_HEALTH - size;                                 //smaller flies live longer
+
     }
 
     /**
@@ -43,8 +44,11 @@ public class Fly {
         return (health > 0);
     }
 
+    /**
+     *
+     */
     public void hunger() {
-        health--;
+        health -= hungerConstant;
     }
 
     /**
@@ -159,7 +163,7 @@ public class Fly {
 
         boolean generated = false;
 
-        //gen random locations until empty spot is found, then add fly there (hard-coded limit of 50 flies in web)
+        //gen random locations until empty spot is found, then add fly there (hard-coded limit of MAX_FLIES in web)
         while (!generated && flies.size() < MAX_FLIES) {
             x = random.nextInt(web.getWebLength());
             y = random.nextInt(web.getWebLength());

@@ -1,21 +1,20 @@
 import java.util.ArrayList;
 
 public class Spider {
-    private static int MAX_VIEW = Game.DIFFICULTY_VIEW;     //
-    private static int MAX_MOVEMENT;                        //
-    private final int MAX_LIFE;                             //currentLife can never be above this value
-    private double life;                                    //Spider health, if it reaches 0, game over
-    private int locationRow;                                //row of spider
-    private int locationCol;                                //column of spider
-    private double hungerConstant;                          //
+    private static int MAX_MOVEMENT;            //
+    private final int MAX_LIFE;                 //currentLife can never be above this value
+    private double life;                        //Spider health, if it reaches 0, game over
+    private int locationRow;                    //row of spider
+    private int locationCol;                    //column of spider
+    private double hungerConstant;              //
 
     public Spider(int webLength) {
-        MAX_MOVEMENT = webLength / 10;
-        MAX_LIFE = (webLength / 25) + 10;
-        life = MAX_LIFE;
-        locationRow = webLength / 2;
-        locationCol = webLength / 2;
-        hungerConstant = 1;
+        MAX_MOVEMENT = webLength / 10;          //
+        MAX_LIFE = (webLength / 25) + 10;       //larger webs are harder, give more health to compensate
+        life = MAX_LIFE;                        //
+        locationRow = webLength / 2;            //
+        locationCol = webLength / 2;            //
+        hungerConstant = 1;                     //
     }
 
     /**
@@ -87,7 +86,7 @@ public class Spider {
 
     public void generateInformation() {
 
-        System.out.printf("Health: %3.1f, Movement: %d%n", life, MAX_MOVEMENT);
+        System.out.printf("Health: %f, Movement: %d%n", life, MAX_MOVEMENT);
     }
 
     /**
@@ -99,7 +98,7 @@ public class Spider {
         if (Game.DEBUG)
             debug(web);
 
-        final int viewRadius = MAX_VIEW; //radius of elements out from the spider that it can feel (1-3 work well)
+        final int viewRadius = Game.DIFFICULTY_VIEW; //radius of elements out from the spider that it can feel (1-3 work well)
         final int viewDiameter = (viewRadius * 2) + 1; //diameter of the view circle
         int formatLength = String.valueOf(Fly.getMaxEnergy()).length(); //formats the width of the spaces
 
@@ -262,9 +261,9 @@ public class Spider {
      */
     public void debug(Web web) {
         System.out.println("Debug: SPIDER");
-        System.out.printf("ROW: %d, COLUMN: %d, HEALTH: %3.1f, MOVEMENT: %d%n",
+        System.out.printf("ROW: %d, COLUMN: %d, HEALTH: %f, MOVEMENT: %d%n",
                 locationRow, locationCol, life, MAX_MOVEMENT);
-        final int viewRadius = MAX_VIEW; //radius of elements out from the spider that it can feel (1-3 work well)
+        int viewRadius = Game.DIFFICULTY_VIEW; //radius of elements out from the spider that it can feel (1-3 work well)
         final int viewDiameter = (viewRadius * 2) + 1; //diameter of the view circle
         int changeRow;
         int changeCol;
