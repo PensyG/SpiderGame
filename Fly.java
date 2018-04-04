@@ -5,34 +5,49 @@ import java.util.Random;
  *
  */
 public class Fly {
+
     private static Random random = new Random();
-    private static final int MAXSIZE = 5;                       // max size fly, should be 0-8 (but can be any)
+    private static ArrayList<Fly> flies = new ArrayList<>();    //Fly array
+
+    private static final int MAX_SIZE = 3;                       // max size fly, should be 0-8 (but can be any)
     private static final int TURN_GEN = 4;                      //
     private static final int MAX_FLIES = 10;                    //
-    private static ArrayList<Fly> flies = new ArrayList<>();    //
+    private static final int MAX_HEALTH = 10;                   //the maximum amount of health a fly can have
 
     private int locationRow;                //row of fly
     private int locationCol;                //column of fly
     private int vibrateEnergy;              //energy of the fly is based on web size, used in Web.vibrate()
     private int size;                       //size of fly, larger = more energy given
-    private static double struggleChance;   //percent per turn fly has to get out, linear chance based on webSize
+    private int health;                     //health value of the fly, if it reaches 0, fly dies
+    private int struggleChance;             //percent per turn fly has to get out, linear chance based on webSize
+    private int hungerConstant;
 
     /**
-     *
-     * @param webSize - Size of the web being played on
+     * @param webSize      - Size of the web being played on
      * @param locationRow_ - row of the web (i)
      * @param locationCol_ - column of the web (j)
      */
     public Fly(int webSize, int locationRow_, int locationCol_) {
-        locationRow = locationRow_;
-        locationCol = locationCol_;
-        size = random.nextInt(MAXSIZE) + 1;
-        vibrateEnergy = (int) (webSize / 2 + (size * 1.2));
-        struggleChance = (double) 1 / webSize;
+        locationRow = locationRow_;                                 //new (i) coordinate
+        locationCol = locationCol_;                                 //new (j) coordinate
+        size = random.nextInt(MAX_SIZE) + 1;                        //gen random size up to Max
+        vibrateEnergy = (webSize / 2 + (webSize / 50) * size);      //vibrate more the larger the size
+        struggleChance = 10 - size;                                //larger flies have easier time escaping
+        health = MAX_HEALTH - size;                                 //smaller flies live longer
     }
 
     /**
-     *
+     * @return
+     */
+    public boolean alive() {
+        return (health > 0);
+    }
+
+    public void hunger() {
+        health--;
+    }
+
+    /**
      * @return
      */
     public int getRow() {
@@ -40,7 +55,6 @@ public class Fly {
     }
 
     /**
-     *
      * @return
      */
     public int getCol() {
@@ -48,7 +62,6 @@ public class Fly {
     }
 
     /**
-     *
      * @return
      */
     public int getEnergy() {
@@ -56,7 +69,6 @@ public class Fly {
     }
 
     /**
-     *
      * @return
      */
     public int getSize() {
@@ -64,7 +76,6 @@ public class Fly {
     }
 
     /**
-     *
      * @return
      */
     public static ArrayList<Fly> getFlies() {
@@ -72,6 +83,7 @@ public class Fly {
     }
 
     /**
+     * used for formatting
      *
      * @return
      */
@@ -87,6 +99,7 @@ public class Fly {
 
     /**
      * checks if current element (i, j) is a fly
+     *
      * @param i - row of Web array
      * @param j - column of Web array
      * @return true if a Fly is there, else false
@@ -100,7 +113,6 @@ public class Fly {
     }
 
     /**
-     *
      * @param web
      */
     public static void update(Web web) {
@@ -112,26 +124,28 @@ public class Fly {
         Fly fly;    //current fly
         for (int i = 0; i < flies.size(); i++) {
             fly = flies.get(i);
+            fly.hunger();
 
-            if (fly.struggleFree())
+            if (!fly.alive()) {
+                System.out.println("The web vibrates less...");
                 flies.remove(i);
+            } else if (fly.struggleFree()) {
+                System.out.println("The web jerks! And vibrates less...");
+                flies.remove(i);
+            }
         }
+
         //debug method
         if (Game.DEBUG)
             debug();
     }
 
     /**
-     *
      * @return
      */
     public boolean struggleFree() {
         //if the random number is lower than the struggleChance, then the fly is free
-        if (random.nextDouble() < struggleChance) {
-            System.out.println("The web seems to be vibrating less");
-            return true;
-        }
-        return false;
+        return (random.nextInt(struggleChance) == 0);
     }
 
     /**
@@ -157,7 +171,7 @@ public class Fly {
     }
 
     /**
-     *  diagnostics on current Fly information
+     * diagnostics on current Fly information
      */
     private static void debug() {
         System.out.println("DEBUG: Fly");

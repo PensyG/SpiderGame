@@ -2,7 +2,7 @@ Possible Future Features
 ************************
 
 Variable difficulty
-    Set difficulties (
+    Set difficulties
         Easy
         Medium
         Hard
@@ -10,7 +10,7 @@ Variable difficulty
         As the game goes on the game gets harder (until it is impossible to survive due to low percentages)
     combination
 fly
-    bigger flies die earlier
+    bigger flies die earlier    (implemented?)
     new action
         Die
             ran out of energy

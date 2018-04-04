@@ -1,13 +1,13 @@
 import java.util.ArrayList;
 
 public class Spider {
-    private static int MAX_VIEW = 3;    //
-    private static int MAX_MOVEMENT;    //
-    private final int MAX_LIFE;         //currentLife can never be above this value
-    private double life;                //Spider health, if it reaches 0, game over
-    private int locationRow;            //row of spider
-    private int locationCol;            //column of spider
-    private double hungerConstant;      //
+    private static int MAX_VIEW = Game.DIFFICULTY_VIEW;     //
+    private static int MAX_MOVEMENT;                        //
+    private final int MAX_LIFE;                             //currentLife can never be above this value
+    private double life;                                    //Spider health, if it reaches 0, game over
+    private int locationRow;                                //row of spider
+    private int locationCol;                                //column of spider
+    private double hungerConstant;                          //
 
     public Spider(int webLength) {
         MAX_MOVEMENT = webLength / 10;
@@ -15,7 +15,7 @@ public class Spider {
         life = MAX_LIFE;
         locationRow = webLength / 2;
         locationCol = webLength / 2;
-        hungerConstant = webLength / 50;
+        hungerConstant = 1;
     }
 
     /**
@@ -37,7 +37,6 @@ public class Spider {
     }
 
     /**
-     *
      * @param row
      * @param col
      */
@@ -57,7 +56,7 @@ public class Spider {
         for (int i = 0; i < flies.size(); i++) {
             fly = flies.get(i);
             if (fly.getRow() == locationRow && fly.getCol() == locationCol) {
-                System.out.println("Fly found!");
+                System.out.println("Fly eaten.");
                 life += fly.getEnergy();
                 Game.adjustScore(5);
                 flies.remove(fly);
@@ -66,7 +65,6 @@ public class Spider {
     }
 
     /**
-     *
      * @param flies
      */
     public void update(ArrayList<Fly> flies) {
@@ -129,11 +127,11 @@ public class Spider {
                         System.out.print(String.format("%-" + formatLength + "d ",
                                 web.getVibration(currentRow, currentCol)));
 
-                }
-                else
+                } else
                     System.out.print(String.format("%-" + formatLength + "s ", "-"));
 
-            } System.out.println();
+            }
+            System.out.println();
         }
     }
 
@@ -189,7 +187,7 @@ public class Spider {
                 }
                 //duplicate directions (dd = 2) or conflicting opposite inputs (ws or ad) or non directional key
                 validDirection = (!(Math.abs(directionRow) == 2 || Math.abs(directionCol) == 2) &&
-                    !(directionRow == 0 && directionCol == 0) && !invalidKey);
+                        !(directionRow == 0 && directionCol == 0) && !invalidKey);
             }
 
             //SECOND STRING (numerical)
@@ -212,12 +210,10 @@ public class Spider {
             if (web.checkBounds(newLocation[0], newLocation[1])) {
                 //return new, valid position in web after
                 return newLocation;
-            }
-            else
+            } else
                 System.out.println("Out of bounds.");
-        }
-        else
-         System.out.println("Invalid input");
+        } else
+            System.out.println("Invalid input");
         //return invalid element, movement command is invalid
         return null;
     }
@@ -262,7 +258,6 @@ public class Spider {
     }
 
     /**
-     *
      * @param web
      */
     public void debug(Web web) {
