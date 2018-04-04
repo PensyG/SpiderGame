@@ -1,128 +1,37 @@
-4 classes
-    Game
-    Fly
-    Spider
-    Web
+Possible Future Features
+************************
 
-Game
-    constants
-        help
-            menu
-            in-game
-        quit
-            death
-            user
-    display score
-    display text
-    Menu
-        Start
-            setupGame
-                create objects
-                Game Controller
-                    Turn based
-                        score
-                            add some each turn (survival)
-                        update
-                            Fly
-                                Struggle
-                                GenerateFly
-                                Hunger
-                            Web
-                                Change elements
-                            Player
-                                Get turn
-                                    help (in-game)
-                                        displays info about movement
-                                    move
-                                    quit
-                            Spider
-                                eat (attempt)
-                                    add to score
-                                hunger
-                                set health
-        Help (menu)
-            Display information about the game
-        OPTIONS
-            DIFFICULTY
-                EASY
-                    VIEW = 3
-                    HEALTH = 20
-                MEDIUM
-                    VIEW = 2
-                    HEALTH = 15
-                HARD
-                    VIEW = 1
-                    HEALTH = 10
-            debug
-                web
-                    display entire web
-                fly
-                    location
-                    health
-                    vibrate energy
-                    struggle chance
-                spider
-                    health
-        Quit
+Variable difficulty
+    Set difficulties (
+        Easy
+        Medium
+        Hard
+    Arcade style
+        As the game goes on the game gets harder (until it is impossible to survive due to low percentages)
+    combination
+fly
+    bigger flies die earlier
+    new action
+        Die
+            ran out of energy
+            stop vibrating, can't be eaten, and removed from Fly array
+        Exhaust
+            lose health each turn due to using energy to vibrate
 
-Web
-    attributes
-        web length
-        int[][] array
-            [web length][web length]
-    update
-        calculate elements
-    max distance
-        between two elements (includes diagonal)
-Fly
-    class constants
-        max size
-            maximum size a fly can be, influences vibration value and nutrient amount
-        turn generation
-        1 / (turn gen) percent chance to generate a fly
-        max flies
-            max amount of flies that the web can hold
-
-    attributes
-        health
-            - health of the fly, goes down over time, if it reaches 0 it dies
-        vibrate
-            - amount of energy the fly is vibrating the web, decreases by one for each element away (includes diagonal)
-        struggle
-            - percent chance each turn the fly has to escape
-        location
-            - row of web
-            - column of web
-    struggle
-        attempt to get free from web
-    EXHAUST
-        LOSE HEALTH FROM STARVING (STRUGGLING)
-
-Spider
-    class constants
-        max view
-            the view distance of the spider
-        max life
-            the maximum amount of life the spider can have
-        max movement
-            the maximum amount of space the spider can move each turn
-    attributes
-        life
-            health of the spider, gains it by eating flies, loses it each turn
-        location
-            column
-            row
-        hungerValue
-            amount of health that goes down
-    Movement
-        8 directional
-            up, down, left, right, (+ diagonals)
-    view
-        view of the web vibration values around the spider of max_view radius
-    eat
-        consume flies
-            gain health
-
-
-
-
+Score System update
+    fly size affects score
+        bigger flies, more points
+    variable difficulty score multiplier
+        set difficulty style
+            score multiplier
+                Easy *= .75
+                Medium *= 1.0
+                Hard *= 1.25
+        arcade style
+            exponential score multiplier based on turn amount
+        combination
+            set difficulty to determine view distance, and starting health
+                easy = 3
+                medium = 2
+                hard = 1
+            then use arcade style to see how long the player lasts
