@@ -1,0 +1,6 @@
+v1.0
+    general completion
+
+v1.0.1
+    fly health and hunger added
+    adjusted spider health and hunger generation
