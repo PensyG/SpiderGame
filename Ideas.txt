@@ -5,17 +5,16 @@ Variable difficulty
     Arcade style
         As the game goes on the game gets more and more difficult
             difficulty updates after x amount of turns, ex: (5, 10), becomes too impossible to survive
-
 Score System update
     variable difficulty score multiplier
         arcade style
             exponential score multiplier based on turn amount
                 is tied to difficulty update
 
-New game-play style
-    flies are more commonly generated based on their size
-        smaller flies are much more common
-        large flies are more rare
-
 GUI
     change the interface of the game to be a window, instead of a console
+
+TODO
+    clean up comments
+    fine tune current numbers
+        fly base vibration buff?

@@ -1,4 +1,4 @@
-v1.0
+v1.0.0
     - General completion
 
 v1.0.1
@@ -10,3 +10,18 @@ v1.0.2
         - Fly enum size type
         - score update to give more for larger flies
     - General cleanup
+
+v.1.1.0
+    - New game-play style
+        - Max flies dependent on array size
+            - for every 50x50 section (100x100 has 4 of them)
+            (plus a few more for larger arrays) to balance for view distance
+                - 5 small flies
+                - 3 medium flies
+                - 1 large
+        - fly vibration is no longer based on size of the array, is based on 50x50
+        - set movement of 5 squares each turn
+
+    - removed hunger and health, too many different things were needing to be adjusted
+    after game-play rework
+    - score menu rework, shows more information

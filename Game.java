@@ -1,6 +1,9 @@
 import java.util.ArrayList;
 import java.util.Scanner;
 
+/**
+ *
+ */
 public class Game {
     private static Scanner keyboard = new Scanner(System.in);
     private static int score;                           //score of the player
@@ -115,6 +118,7 @@ public class Game {
         //create objects
         Web web = new Web(webSize);
         Spider spider = new Spider(webSize);
+        Fly.setConstants(webSize);
         //static Fly array
 
         //start game
@@ -133,7 +137,7 @@ public class Game {
         int action;
         Game.score = 0;
         Game.turns = 0;
-        Fly.generateFly(web);
+        flies.clear();
 
         do {
             //add one to score each turn
@@ -144,23 +148,23 @@ public class Game {
             objectUpdate(spider, web, flies);
 
             //user turn
-            spider.generateInformation();
-            spider.generateView(web);
-            action = getInput(spider, web);
-
             if (!spider.alive())
                 action = QUIT_DEATH;
+            else {
+                spider.generateInformation();
+                spider.generateView(web);
+                action = getInput(spider, web);
+            }
 
             //continue game (positive values are continues, allows for custom information)
             if (action >= 0) {
+                System.out.println("***********");
                 spider.update(flies);
-                System.out.println("-------------");    //separate each turn
             }
-            //quit value encountered
+            //quit value encountered (any negative menu constants)
             else {
                 displayText(action);
-
-                score();
+                displayScore();
                 continueGame = false;
             }
         } while (continueGame);
@@ -196,8 +200,8 @@ public class Game {
 
         displayText(MENU_DIFFICULTY);
         do {
-            System.out.print("Current Difficulty: " + Game.DIFFICULTY + "\n" +
-                    "Input: ");
+            System.out.print("Current Difficulty: " + Game.DIFFICULTY +
+                    "\nInput: ");
             userInput = keyboard.nextLine();
 
             switch (userInput.toLowerCase()) {
@@ -272,7 +276,6 @@ public class Game {
     }
 
     /**
-     *
      * @param spider
      * @param web
      * @param flies
@@ -306,16 +309,21 @@ public class Game {
     /**
      *
      */
-    public static void score() {
-        //set and display score
+    public static void displayScore() {
+        System.out.print("SCORE:" +
+                "\n**********************" +
+                "\n** Survival: " + turns +
+                "\n** Flies: " + score +
+                "\n**********************" +
+                "\n** Difficulty: " + DIFFICULTY +
+                "\n** Multiplier: " + DIFFICULTY_MULTIPLIER +
+                "\n**********************\n");
         score += turns;
-        //score *= SURVIVAL_MULTIPLIER
         score *= DIFFICULTY_MULTIPLIER;
-        System.out.println("Score: " + score);
+        System.out.printf("TOTAL: %d%n%n", score);
     }
 
     /**
-     *
      * @param value
      */
     public static void displayText(int value) {

@@ -9,9 +9,12 @@ public class Fly {
     private static Random random = new Random();
     private static ArrayList<Fly> flies = new ArrayList<>();    //Fly array
 
-    private static final int TURN_GEN = 3;                      //
-    private static final int MAX_FLIES = 10;                    //
-    private static final int MAX_HEALTH = 10;                   //the maximum amount of health a fly can have
+    private static int MAX_SMALL;       //maximum amount of small flies allowed in web
+    private static int MAX_MEDIUM;      //maximum amount of medium flies
+    private static int MAX_LARGE;       //maximum amount of large flies
+    private static int currentSmall;    //current small flies
+    private static int currentMedium;   //current medium flies
+    private static int currentLarge;    //current large flies
 
     private int locationRow;            //row of fly
     private int locationCol;            //column of fly
@@ -20,32 +23,55 @@ public class Fly {
     private int struggleChance;         //percent per turn fly has to get out, linear chance based on webSize
     private int hungerConstant;         //constant that is taken from health each turn (higher for larger flies?)
     private int scoreValue;             //score value of the fly
+    private int foodValue;
     private FlySize size;               //size of fly, larger = more energy given
 
     /**
-     * @param webSize      - Size of the web being played on
      * @param locationRow_ - row of the web (i)
      * @param locationCol_ - column of the web (j)
      */
-    public Fly(int webSize, int locationRow_, int locationCol_) {
+    public Fly(int locationRow_, int locationCol_, FlySize size_) {
         locationRow = locationRow_;                                         //new (i) coordinate
         locationCol = locationCol_;                                         //new (j) coordinate
-        vibrateEnergy = (webSize / 2 + (webSize / 50) * size.ordinal());    //vibrate more the larger the size
-        health = MAX_HEALTH - size.ordinal();                               //smaller flies live longer
-        struggleChance = 10 - size.ordinal();                               //larger flies have easier time escaping
+        size = size_;
+        health = 15;                    //smaller flies live longer
+        struggleChance = 15;            //larger flies have easier time escaping
         hungerConstant = 1;
-        scoreValue = size.ordinal() * 5;
-        size = FlySize.getSize();                                           //
+        vibrateEnergy = (size.ordinal() + 1) * 5;              //vibrate more the larger the size
+        foodValue = (size.ordinal() + 1) * 2;
+        scoreValue = (size.ordinal()+ 1) * 5;
     }
 
     /**
-     * variable fly size
+     * variable fly size, looks at the max amounts of each fly that can be created,
+     * which are generated in setConstants each game
      */
     public enum FlySize {
-        Tiny, Small, Medium, Large, Huge;
-        public static FlySize getSize() {
-            return values()[random.nextInt(FlySize.values().length)];
+        Small, Medium, Large;
+
+        public static FlySize newSize() {
+            if (currentSmall < MAX_SMALL)
+                return Small;
+            else if (currentMedium < MAX_MEDIUM)
+                return Medium;
+            else if (currentLarge < MAX_LARGE)
+                return Large;
+            else
+                return null;
         }
+    }
+
+    /**
+     * setup class variables before each game
+     * @param webSize
+     */
+    public static void setConstants(int webSize) {
+        //number of 50x50 quadrants in web
+        int numberQuadrants = (int) Math.pow((webSize / 50), 2);
+
+        MAX_SMALL = (int) (5.5 * numberQuadrants);
+        MAX_MEDIUM = (int) (3.33 * numberQuadrants);
+        MAX_LARGE = (int) (1.2 * numberQuadrants);
     }
 
     /**
@@ -66,10 +92,17 @@ public class Fly {
      *
      * @return
      */
+    public int getFoodValue() {
+        return foodValue;
+    }
+
+    /**
+     *
+     * @return
+     */
     public int getScoreValue() {
         return scoreValue;
     }
-
 
     /**
      * @return
@@ -137,27 +170,39 @@ public class Fly {
     }
 
     /**
+     *
+     */
+    private static void updateCurrentFlies() {
+        currentSmall = 0;
+        currentMedium = 0;
+        currentLarge = 0;
+
+        Fly fly;
+        for (int i = 0; i < flies.size(); i++) {
+            fly = flies.get(i);
+            switch (fly.getSize()) {
+                case Small:
+                    currentSmall++;
+                    break;
+                case Medium:
+                    currentMedium++;
+                    break;
+                case Large:
+                    currentLarge++;
+                    break;
+                default:
+                    System.out.println("Error in updateCurrentFlies()");
+                    break;
+            }
+        }
+    }
+
+    /**
      * @param web
      */
     public static void update(Web web) {
-        //attempt to generate a fly
-        if (random.nextInt(TURN_GEN) == 0)
-            generateFly(web);
-
-        //test if a fly is under a spider, or if the fly can escape
-        Fly fly;    //current fly
-        for (int i = 0; i < flies.size(); i++) {
-            fly = flies.get(i);
-            fly.hunger();
-
-            if (!fly.alive()) {
-                System.out.println("The web vibrates less...");
-                flies.remove(i);
-            } else if (fly.struggleFree()) {
-                System.out.println("The web jerks! And vibrates less...");
-                flies.remove(i);
-            }
-        }
+        Fly.updateCurrentFlies();
+        generateFlies(web);
 
         //debug method
         if (Game.DEBUG)
@@ -168,7 +213,7 @@ public class Fly {
      * @return
      */
     public boolean struggleFree() {
-        //if the random number is lower than the struggleChance, then the fly is free
+        //if the random number out of StruggleChance is equal to 0
         return (random.nextInt(struggleChance) == 0);
     }
 
@@ -177,19 +222,26 @@ public class Fly {
      *
      * @param web - Web object, is used for it's array and checking capability
      */
-    public static void generateFly(Web web) {
-        int x;  //row
-        int y;  //column
+    public static void generateFlies(Web web) {
 
-        boolean generated = false;
+        int row;  //row
+        int col;  //column
 
-        //gen random locations until empty spot is found, then add fly there (hard-coded limit of MAX_FLIES in web)
-        while (!generated && flies.size() < MAX_FLIES) {
-            x = random.nextInt(web.getWebLength());
-            y = random.nextInt(web.getWebLength());
-            if (!checkFly(x, y)) {
-                flies.add(new Fly(web.getWebLength(), x, y));
-                generated = true;
+        boolean generated;
+        FlySize newSize;
+        //while there are still flies in the web to generate
+        while (FlySize.newSize() != null) {
+            newSize = FlySize.newSize();
+            generated = false;
+            //gen random locations until empty spot is found, then add fly there
+            while (!generated) {
+                row = random.nextInt(web.getWebLength());
+                col = random.nextInt(web.getWebLength());
+                if (!checkFly(row, col)) {
+                    flies.add(new Fly(row, col, newSize));
+                    Fly.updateCurrentFlies();
+                    generated = true;
+                }
             }
         }
     }
@@ -199,14 +251,24 @@ public class Fly {
      */
     private static void debug() {
         System.out.println("DEBUG: Fly");
-        for (int i = 0; i < Fly.flies.size(); i++) {    //struggle
-            System.out.printf("#: %3d, ROW: %3d, COLUMN: %3d, SIZE: %6s, ENERGY: %3d\n",
-                    i,
-                    flies.get(i).getRow(),
-                    flies.get(i).getCol(),
-                    flies.get(i).getSize(),
-                    flies.get(i).getEnergy());
+        for (Fly fly : flies) {    //struggle
+            System.out.printf("#: %3d, ", flies.indexOf(fly) + 1);
+            dump(fly);
         }
         System.out.println("DEBUG: End Flies ------\n");
+    }
+
+    /**
+     * dump the current information about the fly
+     * @param fly
+     */
+    private static void dump(Fly fly) {
+        System.out.printf("ROW: %3d, COLUMN: %3d, SIZE: %6s, ENERGY: %3d, SCORE: %2d, HEALTH: %2d%n",
+                fly.locationRow,
+                fly.locationCol,
+                fly.size,
+                fly.vibrateEnergy,
+                fly.scoreValue,
+                fly.health);
     }
 }

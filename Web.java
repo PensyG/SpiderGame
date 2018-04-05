@@ -8,7 +8,6 @@ public class Web {
     private int webLength;              //length of web array
 
     /**
-     *
      * @param x
      */
     public Web(int x) {
@@ -18,6 +17,7 @@ public class Web {
 
     /**
      * Checks if index sent is within the between 0 - (webLength - 1)
+     *
      * @param i - row of the web array
      * @param j - column of the web web array
      * @return if (i, j) is inside of the bounds of the web array
@@ -44,8 +44,9 @@ public class Web {
 
     /**
      * sets i, j to be the vibration value calculated in the calculateElements
-     * @param i - Row of the index
-     * @param j - Col of the index
+     *
+     * @param i         - Row of the index
+     * @param j         - Col of the index
      * @param vibration - power of the vibration, higher values mean more vibrations
      */
     private void setVibration(int i, int j, int vibration) {
@@ -57,8 +58,9 @@ public class Web {
 
     /**
      * Takes a turn for the web, by updating the web on the new Fly locations
+     *
      * @param spider - Spider object, used for debugging to show spider location in web
-     * @param flies - ArrayList of the Fly objects, used to calculate the vibration values in each element
+     * @param flies  - ArrayList of the Fly objects, used to calculate the vibration values in each element
      */
     public void update(Spider spider, ArrayList<Fly> flies) {
         //update the web vibration values
@@ -134,6 +136,7 @@ public class Web {
     /**
      * displays the web, and the strength values of vibration. Higher values means
      * a fly is in that direction
+     *
      * @param spider - Spider object, used in showing the location of the spider in web
      */
     private void debug(Spider spider) {

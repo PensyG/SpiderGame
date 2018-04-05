@@ -60,6 +60,8 @@ Game
                     struggle chance
                 spider
                     health
+        Options
+            debug switch (boolean)
         Quit
 
 Web
@@ -74,11 +76,9 @@ Web
     debug()
         shows entire web and all locations of objects inside of it
 Fly
+    ArrayList <Fly>
+
     constants
-        max size
-            - maximum size a fly can be, influences vibration value and nutrient amount
-        turn generation
-            - 1 / (turn gen) percent chance to generate a fly
         max flies
             - max amount of flies that the web can hold
 
@@ -93,7 +93,7 @@ Fly
             - row of web
             - column of web
         size
-            - size
+            - influences vibration value and nutrient amount
     struggle()
         attempt to get free from web
 Spider

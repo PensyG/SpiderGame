@@ -1,16 +1,23 @@
 import java.util.ArrayList;
 
+/**
+ *
+ */
 public class Spider {
-    private final int MAX_MOVEMENT;            //
+    private final int MAX_MOVEMENT;             //
     private final int MAX_LIFE;                 //currentLife can never be above this value
 
-    private int life;                        //Spider health, if it reaches 0, game over
+    private int life;                           //Spider health, if it reaches 0, game over
     private int locationRow;                    //row of spider
     private int locationCol;                    //column of spider
-    private int hungerConstant;              //
+    private int hungerConstant;                 //
 
+    /**
+     *
+     * @param webLength
+     */
     public Spider(int webLength) {
-        MAX_MOVEMENT = webLength / 10;          //
+        MAX_MOVEMENT = 5;          //
         MAX_LIFE = (webLength / 10) + 10;       //larger webs are harder, give more health to compensate
         life = MAX_LIFE;                        //
         locationRow = webLength / 2;            //
@@ -31,9 +38,7 @@ public class Spider {
      * @return
      */
     public boolean alive() {
-        if (life <= 0)
-            return false;
-        return true;
+        return (life > 0);
     }
 
     /**
@@ -56,10 +61,13 @@ public class Spider {
         for (int i = 0; i < flies.size(); i++) {
             fly = flies.get(i);
             if (fly.getRow() == locationRow && fly.getCol() == locationCol) {
-                System.out.println(fly.getSize() + " fly eaten.");
-                life += fly.getEnergy();
+                System.out.printf("%s fly eaten. (+%d)%n" +
+                        "***********%n",
+                        fly.getSize(), fly.getScoreValue());
+                life += fly.getFoodValue();
                 Game.adjustScore(fly.getScoreValue());
                 flies.remove(fly);
+
             }
         }
     }
@@ -84,9 +92,7 @@ public class Spider {
         return i == locationRow && j == locationCol;
     }
 
-
     public void generateInformation() {
-
         System.out.printf("Health: %d, Movement: %d%n", life, MAX_MOVEMENT);
     }
 
@@ -99,15 +105,13 @@ public class Spider {
         if (Game.DEBUG)
             debug(web);
 
-        final int viewRadius = Game.DIFFICULTY_VIEW; //radius of elements out from the spider that it can feel (1-3 work well)
-        final int viewDiameter = (viewRadius * 2) + 1; //diameter of the view circle
+        int viewRadius = Game.DIFFICULTY_VIEW; //radius of elements out from the spider that it can see
+        int viewDiameter = (viewRadius * 2) + 1; //diameter of the view square
         int formatLength = String.valueOf(Fly.getMaxEnergy()).length(); //formats the width of the spaces
-
-        //location of spider is [viewRadius][viewRadius]
         int changeRow;
         int changeCol;
-        int currentRow;
-        int currentCol;
+        int currentIterRow;
+        int currentIterCol;
 
         boolean inBounds;
 
@@ -116,25 +120,22 @@ public class Spider {
                 //compares and finds the current spot in the web in relation to what the spider sees
                 changeRow = -(viewRadius - i);
                 changeCol = -(viewRadius - j);
-                currentRow = locationRow + changeRow;
-                currentCol = locationCol + changeCol;
+                currentIterRow = locationRow + changeRow;
+                currentIterCol = locationCol + changeCol;
 
-                inBounds = web.checkBounds(currentRow, currentCol);
+                inBounds = web.checkBounds(currentIterRow, currentIterCol);
                 if (inBounds) {
-                    if (isSpider(currentRow, currentCol))
+                    if (isSpider(currentIterRow, currentIterCol))
                         System.out.print(String.format("%-" + formatLength + "s ", "*"));
                     else
                         System.out.print(String.format("%-" + formatLength + "d ",
-                                web.getVibration(currentRow, currentCol)));
-
+                                web.getVibration(currentIterRow, currentIterCol)));
                 } else
                     System.out.print(String.format("%-" + formatLength + "s ", "-"));
-
             }
             System.out.println();
         }
     }
-
 
     /**
      * checks if the movement is a valid entry, but doesn't check bounds
@@ -191,12 +192,11 @@ public class Spider {
             }
 
             //SECOND STRING (numerical)
-            //attempt to convert the String to an int, invalid if fails
+            //attempt to convert the String to an int
 
             int moveDistance = 0;
             if (Game.isDigit(input[1]))
                 moveDistance = Integer.parseInt(input[1]);
-            //compare to MAX_MOVEMENT if try was successful
             validDistance = ((moveDistance > 0) && (moveDistance <= MAX_MOVEMENT));
         }
 
@@ -214,7 +214,7 @@ public class Spider {
                 System.out.println("Out of bounds.");
         } else
             System.out.println("Invalid input");
-        //return invalid element, movement command is invalid
+        //movement command is invalid
         return null;
     }
 
@@ -227,12 +227,13 @@ public class Spider {
      */
     private int[] calculateMovement(String userInput) {
         String[] input = userInput.split(" ");
-        char[] chars = input[0].toCharArray();
         int[] newElement = new int[2];
+
         int distance = Integer.parseInt(input[1]);
         int changeRow = 0;
         int changeCol = 0;
 
+        char[] chars = input[0].toCharArray();
         for (char c : chars) {
             switch (c) {
                 case 'w':
@@ -305,5 +306,4 @@ public class Spider {
             System.out.println();
         }
     }
-
 }
