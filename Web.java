@@ -87,34 +87,29 @@ public class Web {
         int distance;           //movement blocks from the fly location (includes diagonal)
 
         //init
-        int vibration = 0;        //current vibration value for element
+        int vibrateValue = 0;        //current vibration value for element
 
-        //reset variables
         for (int i = 0; i < webLength; i++) {
             for (int j = 0; j < webLength; j++) {
-
-                //each fly in array
                 for (Fly fly : flies) {
                     //get location and energy of specific fly
                     flyRow = fly.getRow();
                     flyCol = fly.getCol();
                     flyEnergy = fly.getEnergy();
-
                     //distance of specific fly to element
                     distance = getMaxDistance(i, j, flyRow, flyCol);
-
-                    vibration = flyEnergy - distance;      //power of vibration from fly to element
-                    vibrateArray.add(vibration);         //add vibration value to array
+                    vibrateValue = flyEnergy - distance;      //power of vibration from fly to element
+                    vibrateArray.add(vibrateValue);         //add vibration value to array
                 }
                 //find greatest vibration value at this element, clears after running through
                 if (vibrateArray.size() > 0) {
                     for (int e : vibrateArray)
-                        if (e > vibration)
-                            vibration = e;
+                        if (e > vibrateValue)
+                            vibrateValue = e;
                     vibrateArray.clear();
                 }
-                //update vibrations in each element
-                setVibration(i, j, vibration);
+                //update vibration
+                setVibration(i, j, vibrateValue);
             }
         }
     }
@@ -136,8 +131,7 @@ public class Web {
     }
 
     /**
-     * displays the web, and the strength values of vibration. Higher values means
-     * a fly is in that direction
+     * displays the web, and the strength values of vibration.
      *
      * @param spider - Spider object, used in showing the location of the spider in web
      */
@@ -167,12 +161,13 @@ public class Web {
             for (int j = 0; j < webLength; j++) {
                 if (spider.isSpider(i, j))
                     System.out.print(String.format("%-" + formatLength + "s ", "*"));
+                else if(Fly.getFly(i, j) != null)
+                    System.out.print(String.format("%-" + formatLength + "s ",  "F"));
                 else
                     System.out.print(String.format("%-" + formatLength + "d ", getVibration(i, j)));
-
-            } //end column
+            }
             System.out.println();   //separate rows
-        } //end row
+        }
         System.out.println();
-    } //end method
+    }
 }

@@ -2,7 +2,7 @@ import java.util.ArrayList;
 import java.util.Random;
 
 /**
- *
+ * Simulates a fly caught in a web, able to vibrate, and be eaten by a spider
  */
 public class Fly {
 
@@ -21,19 +21,19 @@ public class Fly {
     private int vibrateEnergy;          //energy of the Fly, based on FlySize enum type
     private int scoreValue;             //score value of the fly
     private int foodValue;              //food value of the fly, given to the Spider as life when eaten
-    private FlySize size;               //size of fly, larger = more energy given
+    private FlySize size;               //size of fly, larger = bigger vibrations
 
     /**
      * @param locationRow_ - row of the web (i)
      * @param locationCol_ - column of the web (j)
      */
     public Fly(int locationRow_, int locationCol_, FlySize size_) {
-        locationRow = locationRow_;                                         //new (i) coordinate
-        locationCol = locationCol_;                                         //new (j) coordinate
-        size = size_;
-        vibrateEnergy = (size.ordinal() + 1) * 5;              //vibrate more the larger the size
-        foodValue = (size.ordinal() + 1) * 2;
-        scoreValue = (size.ordinal()+ 1) * 5;
+        locationRow = locationRow_;                     //new (i) coordinate
+        locationCol = locationCol_;                     //new (j) coordinate
+        size = size_;                                   //FlySize
+        vibrateEnergy = (size.ordinal() + 1) * 5;       //vibrate more the larger the size
+        foodValue = (size.ordinal() + 1) * 2;           //For each size, give 2 health when eaten
+        scoreValue = (size.ordinal()+ 1) * 5;           //for each size, give 5 score when eaten
     }
 
     /**
@@ -69,7 +69,6 @@ public class Fly {
     }
 
     /**
-     *
      * @return - the amount of health the Fly is worth
      */
     public int getFoodValue() {
@@ -77,7 +76,6 @@ public class Fly {
     }
 
     /**
-     *
      * @return - The amount of Game.score the Fly is worth
      */
     public int getScoreValue() {
@@ -138,21 +136,21 @@ public class Fly {
      *
      * @param i - row of Web array
      * @param j - column of Web array
-     * @return true if a Fly is there, else false
+     * @return the fly object in that location, or null if it's empty
      */
-    private static boolean checkFly(int i, int j) {
+    public static Fly getFly(int i, int j) {
         //location matches a Fly in the flies array
         for (Fly fly : flies)
             if (i == fly.getRow() && j == fly.getCol())
-                return true;
-        return false;
+                return fly;
+        return null;
     }
 
     /**
      * Updates the amount of each size of Fly in the web, is called in generateFlies to make sure the
      * max amount of flies are in the web each turn
      */
-    private static void updateCurrentFlies() {
+    private static void getCurrentFlies() {
         currentSmall = 0;
         currentMedium = 0;
         currentLarge = 0;
@@ -168,16 +166,17 @@ public class Fly {
                     currentLarge++;
                     break;
                 default:
-                    System.out.println("Error in updateCurrentFlies()");
+                    System.out.println("Error in getCurrentFlies()");
                     break;
             }
     }
 
     /**
+     * updates the current amount of Fly objects in the array
      * @param web - Web object, passed into the generateFlies function
      */
     public static void update(Web web) {
-        Fly.updateCurrentFlies();
+        Fly.getCurrentFlies();
         generateFlies(web);
 
         //debug method
@@ -187,7 +186,7 @@ public class Fly {
 
     /**
      * Generates a fly in a currently unoccupied space
-     * @param web - Web object, is used for it's array and checking capability
+     * @param web - the Web object the fly is being generated in
      */
     private static void generateFlies(Web web) {
 
@@ -204,9 +203,9 @@ public class Fly {
             while (!generated) {
                 row = random.nextInt(web.getWebLength());
                 col = random.nextInt(web.getWebLength());
-                if (!checkFly(row, col)) {
+                if (getFly(row, col) == null) {
                     flies.add(new Fly(row, col, newSize));
-                    Fly.updateCurrentFlies();
+                    Fly.getCurrentFlies();
                     generated = true;
                 }
             }
