@@ -9,18 +9,18 @@ public class Fly {
     private static Random random = new Random();
     private static ArrayList<Fly> flies = new ArrayList<>();    //Fly array
 
-    private static final int MAX_SIZE = 3;                      // max size fly, should be 0-8 (but can be any)
-    private static final int TURN_GEN = 4;                      //
+    private static final int TURN_GEN = 3;                      //
     private static final int MAX_FLIES = 10;                    //
     private static final int MAX_HEALTH = 10;                   //the maximum amount of health a fly can have
 
-    private int locationRow;                //row of fly
-    private int locationCol;                //column of fly
-    private int vibrateEnergy;              //energy of the fly is based on web size, used in Web.vibrate()
-    private int size;                       //size of fly, larger = more energy given
-    private int health;                     //health value of the fly, if it reaches 0, fly dies
-    private int struggleChance;             //percent per turn fly has to get out, linear chance based on webSize
-    private int hungerConstant;             //constant that is taken from health each turn (higher for larger flies?)
+    private int locationRow;            //row of fly
+    private int locationCol;            //column of fly
+    private int vibrateEnergy;          //energy of the fly is based on web size, used in Web.vibrate()
+    private int health;                 //health value of the fly, if it reaches 0, fly dies
+    private int struggleChance;         //percent per turn fly has to get out, linear chance based on webSize
+    private int hungerConstant;         //constant that is taken from health each turn (higher for larger flies?)
+    private int scoreValue;             //score value of the fly
+    private FlySize size;               //size of fly, larger = more energy given
 
     /**
      * @param webSize      - Size of the web being played on
@@ -28,13 +28,24 @@ public class Fly {
      * @param locationCol_ - column of the web (j)
      */
     public Fly(int webSize, int locationRow_, int locationCol_) {
-        locationRow = locationRow_;                                 //new (i) coordinate
-        locationCol = locationCol_;                                 //new (j) coordinate
-        size = random.nextInt(MAX_SIZE) + 1;                        //gen random size up to Max
-        vibrateEnergy = (webSize / 2 + (webSize / 50) * size);      //vibrate more the larger the size
-        struggleChance = 10 - size;                                //larger flies have easier time escaping
-        health = MAX_HEALTH - size;                                 //smaller flies live longer
+        locationRow = locationRow_;                                         //new (i) coordinate
+        locationCol = locationCol_;                                         //new (j) coordinate
+        vibrateEnergy = (webSize / 2 + (webSize / 50) * size.ordinal());    //vibrate more the larger the size
+        health = MAX_HEALTH - size.ordinal();                               //smaller flies live longer
+        struggleChance = 10 - size.ordinal();                               //larger flies have easier time escaping
+        hungerConstant = 1;
+        scoreValue = size.ordinal() * 5;
+        size = FlySize.getSize();                                           //
+    }
 
+    /**
+     * variable fly size
+     */
+    public enum FlySize {
+        Tiny, Small, Medium, Large, Huge;
+        public static FlySize getSize() {
+            return values()[random.nextInt(FlySize.values().length)];
+        }
     }
 
     /**
@@ -50,6 +61,15 @@ public class Fly {
     public void hunger() {
         health -= hungerConstant;
     }
+
+    /**
+     *
+     * @return
+     */
+    public int getScoreValue() {
+        return scoreValue;
+    }
+
 
     /**
      * @return
@@ -75,7 +95,7 @@ public class Fly {
     /**
      * @return
      */
-    public int getSize() {
+    public FlySize getSize() {
         return size;
     }
 
@@ -180,7 +200,7 @@ public class Fly {
     private static void debug() {
         System.out.println("DEBUG: Fly");
         for (int i = 0; i < Fly.flies.size(); i++) {    //struggle
-            System.out.printf("#: %3d, ROW: %3d, COLUMN: %3d, SIZE: %d, ENERGY: %3d\n",
+            System.out.printf("#: %3d, ROW: %3d, COLUMN: %3d, SIZE: %6s, ENERGY: %3d\n",
                     i,
                     flies.get(i).getRow(),
                     flies.get(i).getCol(),

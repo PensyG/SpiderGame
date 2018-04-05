@@ -2,36 +2,20 @@ Possible Future Features
 ************************
 
 Variable difficulty
-    Set difficulties
-        Easy
-        Medium
-        Hard
     Arcade style
-        As the game goes on the game gets harder (until it is impossible to survive due to low percentages)
-    combination
-fly
-    bigger flies die earlier    (implemented?)
-    new action
-        Die
-            ran out of energy
-            stop vibrating, can't be eaten, and removed from Fly array
-        Exhaust
-            lose health each turn due to using energy to vibrate
+        As the game goes on the game gets more and more difficult
+            difficulty updates after x amount of turns, ex: (5, 10), becomes too impossible to survive
 
 Score System update
-    fly size affects score
-        bigger flies, more points
     variable difficulty score multiplier
-        set difficulty style
-            score multiplier
-                Easy *= .75
-                Medium *= 1.0
-                Hard *= 1.25
         arcade style
             exponential score multiplier based on turn amount
-        combination
-            set difficulty to determine view distance, and starting health
-                easy = 3
-                medium = 2
-                hard = 1
-            then use arcade style to see how long the player lasts
+                is tied to difficulty update
+
+New game-play style
+    flies are more commonly generated based on their size
+        smaller flies are much more common
+        large flies are more rare
+
+GUI
+    change the interface of the game to be a window, instead of a console

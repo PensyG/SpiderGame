@@ -1,16 +1,17 @@
 import java.util.ArrayList;
 
 public class Spider {
-    private static int MAX_MOVEMENT;            //
+    private final int MAX_MOVEMENT;            //
     private final int MAX_LIFE;                 //currentLife can never be above this value
-    private double life;                        //Spider health, if it reaches 0, game over
+
+    private int life;                        //Spider health, if it reaches 0, game over
     private int locationRow;                    //row of spider
     private int locationCol;                    //column of spider
-    private double hungerConstant;              //
+    private int hungerConstant;              //
 
     public Spider(int webLength) {
         MAX_MOVEMENT = webLength / 10;          //
-        MAX_LIFE = (webLength / 25) + 10;       //larger webs are harder, give more health to compensate
+        MAX_LIFE = (webLength / 10) + 10;       //larger webs are harder, give more health to compensate
         life = MAX_LIFE;                        //
         locationRow = webLength / 2;            //
         locationCol = webLength / 2;            //
@@ -55,9 +56,9 @@ public class Spider {
         for (int i = 0; i < flies.size(); i++) {
             fly = flies.get(i);
             if (fly.getRow() == locationRow && fly.getCol() == locationCol) {
-                System.out.println("Fly eaten.");
+                System.out.println(fly.getSize() + " fly eaten.");
                 life += fly.getEnergy();
-                Game.adjustScore(5);
+                Game.adjustScore(fly.getScoreValue());
                 flies.remove(fly);
             }
         }
@@ -86,7 +87,7 @@ public class Spider {
 
     public void generateInformation() {
 
-        System.out.printf("Health: %f, Movement: %d%n", life, MAX_MOVEMENT);
+        System.out.printf("Health: %d, Movement: %d%n", life, MAX_MOVEMENT);
     }
 
     /**
@@ -224,7 +225,7 @@ public class Spider {
      * @return a 2 element array with the first being the change in row, and the second element being the
      * change in column
      */
-    public int[] calculateMovement(String userInput) {
+    private int[] calculateMovement(String userInput) {
         String[] input = userInput.split(" ");
         char[] chars = input[0].toCharArray();
         int[] newElement = new int[2];
@@ -259,9 +260,9 @@ public class Spider {
     /**
      * @param web
      */
-    public void debug(Web web) {
+    private void debug(Web web) {
         System.out.println("Debug: SPIDER");
-        System.out.printf("ROW: %d, COLUMN: %d, HEALTH: %f, MOVEMENT: %d%n",
+        System.out.printf("ROW: %d, COLUMN: %d, HEALTH: %d, MOVEMENT: %d%n",
                 locationRow, locationCol, life, MAX_MOVEMENT);
         int viewRadius = Game.DIFFICULTY_VIEW; //radius of elements out from the spider that it can feel (1-3 work well)
         final int viewDiameter = (viewRadius * 2) + 1; //diameter of the view circle

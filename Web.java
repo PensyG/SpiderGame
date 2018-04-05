@@ -7,6 +7,10 @@ public class Web {
     private int[][] web;                //square web array of webLength length
     private int webLength;              //length of web array
 
+    /**
+     *
+     * @param x
+     */
     public Web(int x) {
         webLength = x;
         web = new int[webLength][webLength];
@@ -98,7 +102,6 @@ public class Web {
                     vibration = flyEnergy - distance;      //power of vibration from fly to element
                     vibrateArray.add(vibration);         //add vibration value to array
                 }
-
                 //find greatest vibration value at this element, clears after running through
                 if (vibrateArray.size() > 0) {
                     for (int e : vibrateArray)

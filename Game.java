@@ -3,7 +3,8 @@ import java.util.Scanner;
 
 public class Game {
     private static Scanner keyboard = new Scanner(System.in);
-    private static int score;                           //holds the score of the player
+    private static int score;                           //score of the player
+    private static int turns;                           //turns player has survived each game
 
     //Constants passed to displayText()
     //can be any numbers, but are grouped
@@ -17,16 +18,15 @@ public class Game {
     private final static int MENU_WEB = 22;             //displays menu for webSize input
     private final static int MENU_OPTIONS = 23;         //displays menu for options input
 
-    private final static int QUIT_DEATH = -1;           //
-    private final static int QUIT_PLAYER = -2;          //
+    private final static int QUIT_DEATH = -1;           //spider died
+    private final static int QUIT_PLAYER = -2;          //user quit the game
 
     //game constants (should be changed in-game)
     public static boolean DEBUG = false;                //debug flag, will call extra methods during game if true
 
-    private static String DIFFICULTY = "Medium";        //
-    public static int DIFFICULTY_VIEW = 2;              //
-    public static double DIFFICULTY_MULTIPLIER = 1;     //
-
+    private static String DIFFICULTY = "Medium";        //Used to display current difficulty
+    public static int DIFFICULTY_VIEW = 2;              //Spider view, used in Spider class
+    private static double DIFFICULTY_MULTIPLIER = 1;    //score multiplier
 
 
     /**
@@ -74,13 +74,15 @@ public class Game {
         int webSize = 0;
         boolean validWeb;
 
-        displayText(MENU_WEB);
+        //get webSize for game
+
         do {
+            displayText(MENU_WEB);
             System.out.print("#: ");
             userInput = keyboard.nextLine();
 
+            validWeb = true;    //reset flag
             //set webSize
-            validWeb = true;
             switch (userInput.toLowerCase()) {
                 case "1":
                 case "small":
@@ -107,7 +109,7 @@ public class Game {
 
         setDifficulty();
 
-        System.out.println("Starting game...\n" +
+        System.out.println("\nStarting game...\n" +
                 "(Enter 'help' for move info)\n");
 
         //create objects
@@ -127,17 +129,17 @@ public class Game {
      */
     public static void gameController(Web web, Spider spider, ArrayList<Fly> flies) {
 
-        int turnCount = 0;
         boolean continueGame = true;
         int action;
         Game.score = 0;
+        Game.turns = 0;
         Fly.generateFly(web);
 
         do {
             //add one to score each turn
             adjustScore(1);
-            turnCount++;
-            System.out.println("Turn: " + turnCount);
+            Game.turns++;
+            System.out.println("Turn: " + Game.turns);
             //update Web and Fly
             objectUpdate(spider, web, flies);
 
@@ -157,7 +159,8 @@ public class Game {
             //quit value encountered
             else {
                 displayText(action);
-                displayScore();
+
+                score();
                 continueGame = false;
             }
         } while (continueGame);
@@ -176,7 +179,7 @@ public class Game {
             case "1":
             case "debug":
                 DEBUG = !DEBUG;
-                System.out.printf("Debug set to: %b%n", DEBUG);
+                System.out.printf("Debug changed to: %b%n%n", DEBUG);
                 break;
             default:
                 System.out.println("Invalid Input");
@@ -184,6 +187,9 @@ public class Game {
         }
     }
 
+    /**
+     *
+     */
     public static void setDifficulty() {
         String userInput;
         boolean cont = true;   //flag for user to continue
@@ -224,8 +230,6 @@ public class Game {
                     break;
             }
         } while (cont);
-
-
     }
 
     /**
@@ -268,14 +272,13 @@ public class Game {
     }
 
     /**
+     *
      * @param spider
      * @param web
      * @param flies
      */
     public static void objectUpdate(Spider spider, Web web, ArrayList<Fly> flies) {
-        //Fly update
         Fly.update(web);
-        //web update
         web.update(spider, flies);
     }
 
@@ -300,12 +303,21 @@ public class Game {
         score += adjust;
     }
 
-    public static void displayScore() {
+    /**
+     *
+     */
+    public static void score() {
         //set and display score
+        score += turns;
+        //score *= SURVIVAL_MULTIPLIER
         score *= DIFFICULTY_MULTIPLIER;
         System.out.println("Score: " + score);
     }
 
+    /**
+     *
+     * @param value
+     */
     public static void displayText(int value) {
         switch (value) {
             case QUIT_DEATH:
@@ -360,7 +372,7 @@ public class Game {
                         "1. Debug: %b%n", DEBUG);
                 break;
             default:
-                System.out.print("displayText() incorrectly called\n");
+                System.out.print("ERROR: displayText() incorrectly called\n");
                 break;
         }
     }

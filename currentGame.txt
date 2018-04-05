@@ -6,14 +6,22 @@
 
 Game
     constants
-        help
+        displayText
             menu
-            in-game
-        quit
-            death
-            user
-    display score
-    display text
+                main
+                difficulty
+                web
+                options
+            help
+                menu
+                in-game
+                difficulty
+            quit
+                death
+                user
+
+    display score()
+    display text()
     Menu
         Start
             setupGame
@@ -59,18 +67,20 @@ Web
         web length
         int[][] array
             [web length][web length]
-    update
-        calculate elements
-    max distance
+    update()
+        calculateElements()
+    maxDistance()
         between two elements (includes diagonal)
+    debug()
+        shows entire web and all locations of objects inside of it
 Fly
-    class constants
+    constants
         max size
-            maximum size a fly can be, influences vibration value and nutrient amount
+            - maximum size a fly can be, influences vibration value and nutrient amount
         turn generation
-        1 / (turn gen) percent chance to generate a fly
+            - 1 / (turn gen) percent chance to generate a fly
         max flies
-            max amount of flies that the web can hold
+            - max amount of flies that the web can hold
 
     attributes
         health
@@ -82,12 +92,12 @@ Fly
         location
             - row of web
             - column of web
-    struggle
+        size
+            - size
+    struggle()
         attempt to get free from web
-
-
 Spider
-    class constants
+    constants
         max view
             the view distance of the spider
         max life
@@ -105,9 +115,9 @@ Spider
     Movement
         8 directional
             up, down, left, right, (+ diagonals)
-    view
+    view()
         view of the web vibration values around the spider of max_view radius
-    eat
+    eat()
         consume flies
             gain health
 

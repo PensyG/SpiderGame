@@ -1,6 +1,12 @@
 v1.0
-    general completion
+    - General completion
 
 v1.0.1
-    fly health and hunger added
-    adjusted spider health and hunger generation
+    - Fly health and hunger added
+    - Spider health and hunger generation adjusted
+
+v1.0.2
+    - Added:
+        - Fly enum size type
+        - score update to give more for larger flies
+    - General cleanup
