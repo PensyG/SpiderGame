@@ -8,6 +8,7 @@ public class Game {
     private static Scanner keyboard = new Scanner(System.in);
     private static int score;                           //score of the player
     private static int turns;                           //turns player has survived each game
+    private static double survivalMultiplier;           //exponential score multiplier and difficulty adjuster
 
     //Constants passed to displayText()
     //can be any numbers, but are grouped
@@ -140,11 +141,20 @@ public class Game {
         //reset variables
         Game.score = 0;
         Game.turns = 0;
+        Game.survivalMultiplier = 1;
         flies.clear();
+
 
         do {
             Game.turns++;
             System.out.println("Turn: " + Game.turns);
+
+            //update multiplier every 5th turn by 5%
+            if (turns % 10 == 0) {
+                adjustConstants();
+            }
+
+            Fly.getFlies().clear();
 
             //update Web and Fly
             objectUpdate(spider, web, flies);
@@ -286,6 +296,15 @@ public class Game {
     }
 
     /**
+     * Adjusts the game values as the game continues, increasing multipliers, and difficulties
+     * called every X turns
+     */
+    private static void adjustConstants() {
+        survivalMultiplier *= 1.025;
+        Fly.adjustConstants();
+    }
+
+    /**
      * updates the current objects excluding the player (Spider), can be adapted for more
      * also calls debug methods if debug mode is on
      * @param spider - Spider object, passed into web update
@@ -320,21 +339,22 @@ public class Game {
     }
 
     /**
-     * calculates and displays the score of the player
+     * calculates and displays the score of the player after factoring in multipliers
      */
     private static void displayScore() {
-        System.out.print("SCORE:" +
-                "\n**********************" +
-                "\n** Survival: " + turns +
+        int survivalScore = (int) (turns * survivalMultiplier);
+        score += survivalScore;
+        score *= DIFFICULTY_MULTIPLIER;
+        int finalScore = (int) ((score + survivalScore) * DIFFICULTY_MULTIPLIER);
+
+        System.out.print("**********************" +
+                "\n** Survival: " + survivalScore +
                 "\n** Flies: " + score +
                 "\n**********************" +
                 "\n** Difficulty: " + DIFFICULTY +
                 "\n** Multiplier: " + DIFFICULTY_MULTIPLIER +
-                "\n**********************\n");
-        //add turns into score, and gets the final score after multipliers
-        score += turns;
-        score *= DIFFICULTY_MULTIPLIER;
-        System.out.printf("TOTAL: %d%n%n", score);
+                "\n**********************" +
+                "\nTOTAL SCORE: " + finalScore + "\n\n");
     }
 
     /**
@@ -351,17 +371,24 @@ public class Game {
                 System.out.print("Exiting Current Game...\n\n");
                 break;
             case HELP_IN_GAME:
-                System.out.print("A 2 character max combination input of the four cardinal directions mapped\n" +
-                        "to 'WASD' allows you to move in 8 directions. In addition, you have a certain\n" +
-                        "distance you move in any of those directions each turn, based on the size of\n" +
-                        "the web. Separate the two with a space, and you have a valid input: 'wd 5',\n" +
-                        "or 'a 7'.\n");
+                System.out.print(
+                        "A 2 character max combination input of the four cardinal directions mapped to 'WASD'" +
+                        "UP = 'w', DOWN = 's', RIGHT = 'd', LEFT = 'A'. This allows you to move in 8 directions. " +
+                        "In addition, you can only move 5 elements each turn. You can't input opposite\n" +
+                        "directions (RIGHT-LEFT, UP-DOWN) or the same direction twice (UP-UP). It must also " +
+                        "be in 'Direction - Distance' format, 'Distance - Direction' won't work.\n" +
+                        "Valid: 'wd 5', 'a 1', 's 5'\n" +
+                        "Invalid: 'ss 3', 'ad 2', 'a 6', '3 sd'\n\n");
                 break;
             case HELP_MAIN:
-                System.out.print("Navigate the web as a spider with a limited view distance. Flies will randomly\n" +
-                        "get stuck in your web, and vibrate. You can feel the vibration around yourself,\n" +
-                        "and your goal is to find and eat flies to stay alive. The flies have a chance to\n" +
-                        "escape each turn, and after a long enough time in the web, can die.\n\n");
+                System.out.print(
+                        "You are a spider '*' in a web with a limited view distance (dependant on difficulty).\n" +
+                        "Flies have gotten stuck in your web. It's your job to navigate the web, and eat them\n" +
+                        "to survive. In order to find them, you must look at the current values in your view.\n" +
+                        "Each value represents a vibration amount given off by a fly. The closer the value is\n" +
+                        "to a fly, the higher the value. Larger flies have larger amounts of vibration and\n" +
+                        "can be felt from farther away. As you survive, fewer flies will get stuck in your\n" +
+                        "web. Eat as many flies as you can to get the highest score.\n\n");
                 break;
             case HELP_DIFFICULTY:
                 System.out.print("Easy: View Distance (3), Score Multiplier (50%) \n" +
