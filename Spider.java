@@ -4,46 +4,44 @@ import java.util.ArrayList;
  *
  */
 public class Spider {
-    private final int MAX_MOVEMENT;             //
+    private final int MAX_MOVEMENT = 5;         //The max amount of elements the spider can move
     private final int MAX_LIFE;                 //currentLife can never be above this value
 
     private int life;                           //Spider health, if it reaches 0, game over
     private int locationRow;                    //row of spider
     private int locationCol;                    //column of spider
-    private int hungerConstant;                 //
 
     /**
-     *
-     * @param webLength
+     * Creates the spider constants for the current game
+     * @param webLength - Diameter of the web
      */
     public Spider(int webLength) {
-        MAX_MOVEMENT = 5;          //
-        MAX_LIFE = (webLength / 10) + 10;       //larger webs are harder, give more health to compensate
-        life = MAX_LIFE;                        //
-        locationRow = webLength / 2;            //
-        locationCol = webLength / 2;            //
-        hungerConstant = 1;                     //
+        MAX_LIFE = (webLength / 10) + 10;       //larger webs are a little harder, give more health to compensate
+        life = MAX_LIFE;                        //start health at max
+        locationRow = webLength / 2;            //Start in middle row
+        locationCol = webLength / 2;            //Start in middle column
     }
 
     /**
      * Subtract health from the spider
      */
     private void hunger() {
-        life -= hungerConstant;
+        life--;
     }
 
     /**
      * checks the health of the spider, if at, or below 0, the game ends
-     *
-     * @return
+     * @return valid if the health is above 0, false otherwise
      */
     public boolean alive() {
         return (life > 0);
     }
 
     /**
-     * @param row
-     * @param col
+     * Changes the spiders location to the new element passed (row, col), will always be a
+     * valid spot in the web
+     * @param row - valid row of web object
+     * @param col - valid column of web object
      */
     public void move(int row, int col) {
         locationRow = row;
@@ -54,7 +52,7 @@ public class Spider {
      * Checks position vs array of Fly object, if one is in the same spot as the spider,
      * the spider eats it and gains health
      *
-     * @param flies
+     * @param flies - current List of Fly objects in web array
      */
     private void eat(ArrayList<Fly> flies) {
         Fly fly;
@@ -73,7 +71,8 @@ public class Spider {
     }
 
     /**
-     * @param flies
+     * updates the spider health attributes
+     * @param flies - current List of Fly objects in web array
      */
     public void update(ArrayList<Fly> flies) {
         eat(flies);
@@ -138,9 +137,9 @@ public class Spider {
     }
 
     /**
-     * checks if the movement is a valid entry, but doesn't check bounds
+     * checks if the movement is valid, and inbounds
      *
-     * @return
+     * @return the new position of the spider, or null
      */
     public int[] getMovement(String userInput, Web web) {
         boolean validDirection = false;
@@ -259,7 +258,7 @@ public class Spider {
     }
 
     /**
-     * @param web
+     * @param web - Web object the spider is currently in
      */
     private void debug(Web web) {
         System.out.println("Debug: SPIDER");

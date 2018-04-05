@@ -18,12 +18,9 @@ public class Fly {
 
     private int locationRow;            //row of fly
     private int locationCol;            //column of fly
-    private int vibrateEnergy;          //energy of the fly is based on web size, used in Web.vibrate()
-    private int health;                 //health value of the fly, if it reaches 0, fly dies
-    private int struggleChance;         //percent per turn fly has to get out, linear chance based on webSize
-    private int hungerConstant;         //constant that is taken from health each turn (higher for larger flies?)
+    private int vibrateEnergy;          //energy of the Fly, based on FlySize enum type
     private int scoreValue;             //score value of the fly
-    private int foodValue;
+    private int foodValue;              //food value of the fly, given to the Spider as life when eaten
     private FlySize size;               //size of fly, larger = more energy given
 
     /**
@@ -34,9 +31,6 @@ public class Fly {
         locationRow = locationRow_;                                         //new (i) coordinate
         locationCol = locationCol_;                                         //new (j) coordinate
         size = size_;
-        health = 15;                    //smaller flies live longer
-        struggleChance = 15;            //larger flies have easier time escaping
-        hungerConstant = 1;
         vibrateEnergy = (size.ordinal() + 1) * 5;              //vibrate more the larger the size
         foodValue = (size.ordinal() + 1) * 2;
         scoreValue = (size.ordinal()+ 1) * 5;
@@ -63,7 +57,7 @@ public class Fly {
 
     /**
      * setup class variables before each game
-     * @param webSize
+     * @param webSize - Current diameter of the web (50, 100, 200, 400)
      */
     public static void setConstants(int webSize) {
         //number of 50x50 quadrants in web
@@ -75,22 +69,8 @@ public class Fly {
     }
 
     /**
-     * @return
-     */
-    public boolean alive() {
-        return (health > 0);
-    }
-
-    /**
      *
-     */
-    public void hunger() {
-        health -= hungerConstant;
-    }
-
-    /**
-     *
-     * @return
+     * @return - the amount of health the Fly is worth
      */
     public int getFoodValue() {
         return foodValue;
@@ -98,51 +78,50 @@ public class Fly {
 
     /**
      *
-     * @return
+     * @return - The amount of Game.score the Fly is worth
      */
     public int getScoreValue() {
         return scoreValue;
     }
 
     /**
-     * @return
+     * @return - The current row of the Fly (i)
      */
     public int getRow() {
         return locationRow;
     }
 
     /**
-     * @return
+     * @return - The current Column of the Fly (j)
      */
     public int getCol() {
         return locationCol;
     }
 
     /**
-     * @return
+     * @return - The vibration value, 5, 10, or 15 based on current sizes
      */
     public int getEnergy() {
         return vibrateEnergy;
     }
 
     /**
-     * @return
+     * @return - Small, Medium, Large
      */
     public FlySize getSize() {
         return size;
     }
 
     /**
-     * @return
+     * @return - the entire Fly array
      */
     public static ArrayList<Fly> getFlies() {
         return flies;
     }
 
     /**
-     * used for formatting
-     *
-     * @return
+     * used for formatting the display of vibration values (so it's all the same value)
+     * @return - the fly
      */
     public static int getMaxEnergy() {
         int maxEnergy = 0;
@@ -170,16 +149,14 @@ public class Fly {
     }
 
     /**
-     *
+     * Updates the amount of each size of Fly in the web, is called in generateFlies to make sure the
+     * max amount of flies are in the web each turn
      */
     private static void updateCurrentFlies() {
         currentSmall = 0;
         currentMedium = 0;
         currentLarge = 0;
-
-        Fly fly;
-        for (int i = 0; i < flies.size(); i++) {
-            fly = flies.get(i);
+        for (Fly fly : flies)
             switch (fly.getSize()) {
                 case Small:
                     currentSmall++;
@@ -194,11 +171,10 @@ public class Fly {
                     System.out.println("Error in updateCurrentFlies()");
                     break;
             }
-        }
     }
 
     /**
-     * @param web
+     * @param web - Web object, passed into the generateFlies function
      */
     public static void update(Web web) {
         Fly.updateCurrentFlies();
@@ -210,19 +186,10 @@ public class Fly {
     }
 
     /**
-     * @return
-     */
-    public boolean struggleFree() {
-        //if the random number out of StruggleChance is equal to 0
-        return (random.nextInt(struggleChance) == 0);
-    }
-
-    /**
      * Generates a fly in a currently unoccupied space
-     *
      * @param web - Web object, is used for it's array and checking capability
      */
-    public static void generateFlies(Web web) {
+    private static void generateFlies(Web web) {
 
         int row;  //row
         int col;  //column
@@ -260,15 +227,14 @@ public class Fly {
 
     /**
      * dump the current information about the fly
-     * @param fly
+     * @param fly - current fly that information is needed
      */
     private static void dump(Fly fly) {
-        System.out.printf("ROW: %3d, COLUMN: %3d, SIZE: %6s, ENERGY: %3d, SCORE: %2d, HEALTH: %2d%n",
+        System.out.printf("ROW: %3d, COLUMN: %3d, SIZE: %6s, ENERGY: %3d, SCORE: %2d%n",
                 fly.locationRow,
                 fly.locationCol,
                 fly.size,
                 fly.vibrateEnergy,
-                fly.scoreValue,
-                fly.health);
+                fly.scoreValue);
     }
 }

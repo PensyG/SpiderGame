@@ -2,7 +2,7 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 /**
- *
+ * The Menus and organization of the Spider Game
  */
 public class Game {
     private static Scanner keyboard = new Scanner(System.in);
@@ -33,12 +33,12 @@ public class Game {
 
 
     /**
-     * @param args
+     * Starts the program, contains the main menu for the game
+     * @param args - empty
      */
     public static void main(String[] args) {
-        String userInput;               //
-        boolean continueMenu = true;    //
-
+        String userInput;               //user input for the menu
+        boolean continueMenu = true;    //flag for quitting the game
 
         do {
             displayText(MENU_MAIN);
@@ -63,7 +63,7 @@ public class Game {
                     continueMenu = false;
                     break;
                 default:
-                    System.out.print("Error: Invalid Number.\n\n");
+                    System.out.print("Error: Invalid Input.\n\n");
                     break;
             }
         } while (continueMenu);
@@ -72,7 +72,7 @@ public class Game {
     /**
      * sets up the webSize and creates the objects to pass into the game controller
      */
-    public static void setupGame() {
+    private static void setupGame() {
         String userInput;
         int webSize = 0;
         boolean validWeb;
@@ -127,27 +127,29 @@ public class Game {
     }
 
     /**
-     * @param web
-     * @param spider
-     * @param flies
+     * Organizes the flow of the game (turn based), called by setupGame
+     * @param web - Web object, updated each turn
+     * @param spider - Spider object, player uses this
+     * @param flies - Fly ArrayList, contains all of the info on the current Fly objects
      */
-    public static void gameController(Web web, Spider spider, ArrayList<Fly> flies) {
+    private static void gameController(Web web, Spider spider, ArrayList<Fly> flies) {
 
-        boolean continueGame = true;
-        int action;
+        boolean continueGame = true;    //flag for
+        int action;         //passed into displayText, uses the Game constants near the declaration
+
+        //reset variables
         Game.score = 0;
         Game.turns = 0;
         flies.clear();
 
         do {
-            //add one to score each turn
-            adjustScore(1);
             Game.turns++;
             System.out.println("Turn: " + Game.turns);
+
             //update Web and Fly
             objectUpdate(spider, web, flies);
 
-            //user turn
+            //if alive, user can take turn
             if (!spider.alive())
                 action = QUIT_DEATH;
             else {
@@ -155,13 +157,12 @@ public class Game {
                 spider.generateView(web);
                 action = getInput(spider, web);
             }
-
             //continue game (positive values are continues, allows for custom information)
             if (action >= 0) {
                 System.out.println("***********");
                 spider.update(flies);
             }
-            //quit value encountered (any negative menu constants)
+            //quit value encountered (any negative menu constants) (action < 0)
             else {
                 displayText(action);
                 displayScore();
@@ -171,10 +172,11 @@ public class Game {
     }
 
     /**
-     *
+     * Options menu, currently only contains the switch for debug mode
      */
-    public static void setOptions() {
-        String userInput;
+    private static void setOptions() {
+        String userInput;           //user keyboard input
+
         displayText(MENU_OPTIONS);
         System.out.print("#: ");
         userInput = keyboard.nextLine();
@@ -192,9 +194,11 @@ public class Game {
     }
 
     /**
-     *
+     * Menu for changing difficulty, currently only Easy, Medium, and Hard are available,
+     * which influence the view distance of the spider (player). Harder difficulties have
+     * higher final score multipliers
      */
-    public static void setDifficulty() {
+    private static void setDifficulty() {
         String userInput;
         boolean cont = true;   //flag for user to continue
 
@@ -203,24 +207,26 @@ public class Game {
             System.out.print("Current Difficulty: " + Game.DIFFICULTY +
                     "\nInput: ");
             userInput = keyboard.nextLine();
-
             switch (userInput.toLowerCase()) {
+                //easy
                 case "1":
                 case "easy":
                     DIFFICULTY_VIEW = 3;
-                    DIFFICULTY_MULTIPLIER = .75;
+                    DIFFICULTY_MULTIPLIER = .5;
                     Game.DIFFICULTY = "Easy";
                     break;
+                //medium
                 case "2":
                 case "medium":
                     DIFFICULTY_VIEW = 2;
-                    DIFFICULTY_MULTIPLIER = 1;
+                    DIFFICULTY_MULTIPLIER = 1.0;
                     Game.DIFFICULTY = "Medium";
                     break;
+                //hard
                 case "3":
                 case "hard":
                     DIFFICULTY_VIEW = 1;
-                    DIFFICULTY_MULTIPLIER = 1.5;
+                    DIFFICULTY_MULTIPLIER = 2.0;
                     Game.DIFFICULTY = "Hard";
                     break;
                 case "help":
@@ -233,17 +239,18 @@ public class Game {
                     System.out.println("Invalid input.");
                     break;
             }
-        } while (cont);
+        } while (cont); //user still wants to change difficulty
     }
 
     /**
-     * Checks to see what the command is. Can either be 1: quit, 2: help menu, 3: valid movement
+     * Checks to see what the command is. Can either be 1: quit, 2: help menu, or checks if valid movement
+     * will make sure the user inputs a valid choice, and won't return until they have
      *
-     * @param spider
-     * @param web
-     * @return
+     * @param spider - Spider object to call movement updates
+     * @param web - web update to check if movement updates are in bounds
+     * @return - Game.constant, will always be a
      */
-    public static int getInput(Spider spider, Web web) {
+    private static int getInput(Spider spider, Web web) {
 
         String userInput;
         int action = 0;
@@ -255,14 +262,17 @@ public class Game {
             userInput = (userInput.toLowerCase()).trim();  //standardize input
 
             switch (userInput) {
+                //quit
                 case "quit":
                 case "exit":
                     action = QUIT_PLAYER;
                     valid = true;
                     break;
+                //help info
                 case "help":
                     displayText(HELP_IN_GAME);
                     break;
+                //check if valid movement
                 default:
                     int[] newLocation = spider.getMovement(userInput, web);
                     if (newLocation != null) {
@@ -276,11 +286,13 @@ public class Game {
     }
 
     /**
-     * @param spider
-     * @param web
-     * @param flies
+     * updates the current objects excluding the player (Spider), can be adapted for more
+     * also calls debug methods if debug mode is on
+     * @param spider - Spider object, passed into web update
+     * @param web - Web object, used to update
+     * @param flies - Fly ArrayList, passed to update web array elements
      */
-    public static void objectUpdate(Spider spider, Web web, ArrayList<Fly> flies) {
+    private static void objectUpdate(Spider spider, Web web, ArrayList<Fly> flies) {
         Fly.update(web);
         web.update(spider, flies);
     }
@@ -288,8 +300,8 @@ public class Game {
     /**
      * Used to check if the String passed is a digit
      *
-     * @param value
-     * @return
+     * @param value - String of random characters
+     * @return true if the value is all 0-9, or false if not (includes non alpha characters like ',' or ' ')
      */
     public static boolean isDigit(String value) {
         boolean isDigit = true;
@@ -300,16 +312,17 @@ public class Game {
     }
 
     /**
-     * @param adjust
+     * changes the score by the parameter passed
+     * @param adjust - amount of score change, can be positive or negative
      */
     public static void adjustScore(int adjust) {
         score += adjust;
     }
 
     /**
-     *
+     * calculates and displays the score of the player
      */
-    public static void displayScore() {
+    private static void displayScore() {
         System.out.print("SCORE:" +
                 "\n**********************" +
                 "\n** Survival: " + turns +
@@ -318,15 +331,18 @@ public class Game {
                 "\n** Difficulty: " + DIFFICULTY +
                 "\n** Multiplier: " + DIFFICULTY_MULTIPLIER +
                 "\n**********************\n");
+        //add turns into score, and gets the final score after multipliers
         score += turns;
         score *= DIFFICULTY_MULTIPLIER;
         System.out.printf("TOTAL: %d%n%n", score);
     }
 
     /**
-     * @param value
+     * uses the value passed to display the relevant text
+     * should only called with valid Game constants
+     * @param value - A HELP, MENU, or QUIT constant from the top of Game
      */
-    public static void displayText(int value) {
+    private static void displayText(int value) {
         switch (value) {
             case QUIT_DEATH:
                 System.out.print("The Spider has died...\n\n");
@@ -348,9 +364,9 @@ public class Game {
                         "escape each turn, and after a long enough time in the web, can die.\n\n");
                 break;
             case HELP_DIFFICULTY:
-                System.out.print("Easy: View Distance (3), Score Multiplier (75%) \n" +
+                System.out.print("Easy: View Distance (3), Score Multiplier (50%) \n" +
                         "Medium: View Distance (2), Score Multiplier (100%)\n" +
-                        "Hard: View Distance (1), Score Multiplier (150%)\n\n");
+                        "Hard: View Distance (1), Score Multiplier (200%)\n\n");
                 break;
             case MENU_MAIN:
                 System.out.print("Spider Game\n" +

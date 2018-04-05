@@ -1,14 +1,16 @@
 import java.util.ArrayList;
 
 /**
- *
+ * The web contains a 2D array of int values, each element is calculated by the size and distance of each
+ * Fly currently in the web. The Spider uses this web to move around, and find Fly objects to eat. It is a
+ * Square 2D array based of sizes 50, 100, 200, or 400.
  */
 public class Web {
     private int[][] web;                //square web array of webLength length
     private int webLength;              //length of web array
 
     /**
-     * @param x
+     * @param x - diameter of the web
      */
     public Web(int x) {
         webLength = x;

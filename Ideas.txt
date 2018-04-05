@@ -13,8 +13,3 @@ Score System update
 
 GUI
     change the interface of the game to be a window, instead of a console
-
-TODO
-    clean up comments
-    fine tune current numbers
-        fly base vibration buff?
