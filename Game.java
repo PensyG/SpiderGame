@@ -37,16 +37,20 @@ public class Game {
      * Starts the program, contains the main menu for the game
      * @param args - empty
      */
-    public static void main(String[] args) {
+    public static void main(String[] args)
+    {
         String userInput;               //user input for the menu
         boolean continueMenu = true;    //flag for quitting the game
 
-        do {
+        do
+        {
             displayText(MENU_MAIN);
             System.out.print("Input: ");
             userInput = keyboard.nextLine();
 
-            switch (userInput.toLowerCase()) {
+            //switch for userInput
+            switch (userInput.toLowerCase())
+            {
                 case "1":
                 case "start":
                     setupGame();
@@ -66,28 +70,33 @@ public class Game {
                 default:
                     System.out.print("Error: Invalid Input.\n\n");
                     break;
-            }
-        } while (continueMenu);
-    }
+            }//end of userInput switch
+        }//end of do-while loop for startup menu userInput
+        while (continueMenu);
+    }//end of main
 
     /**
      * sets up the webSize and creates the objects to pass into the game controller
      */
-    private static void setupGame() {
+    private static void setupGame()
+    {
         String userInput;
         int webSize = 0;
         boolean validWeb;
 
-        //get webSize for game
-
-        do {
+        //display webSize options and get webSize for game from user
+        do
+        {
+            //display web options
             displayText(MENU_WEB);
             System.out.print("#: ");
             userInput = keyboard.nextLine();
 
             validWeb = true;    //reset flag
-            //set webSize
-            switch (userInput.toLowerCase()) {
+            
+            //switch to set webSize
+            switch (userInput.toLowerCase())
+            {
                 case "1":
                 case "small":
                     webSize = 50;
@@ -108,8 +117,9 @@ public class Game {
                     System.out.print("Invalid Input. \n");
                     validWeb = false;
                     break;
-            }
-        } while (!validWeb);
+            }//end of webSize switch
+        }//end of do-while loop for webSize
+        while (!validWeb);
 
         setDifficulty();
 
@@ -125,7 +135,7 @@ public class Game {
         //start game
         gameController(web, spider, Fly.getFlies());
         //go back to main menu
-    }
+    }//end of setupGame method
 
     /**
      * Organizes the flow of the game (turn based), called by setupGame
@@ -135,24 +145,27 @@ public class Game {
      */
     private static void gameController(Web web, Spider spider, ArrayList<Fly> flies) {
 
-        boolean continueGame = true;    //flag for
-        int action;         //passed into displayText, uses the Game constants near the declaration
+        boolean continueGame = true;    //flag for game play
+        int action;                     //passed into displayText, uses the Game constants near the declaration
 
         //reset variables
         Game.score = 0;
         Game.turns = 0;
         Game.survivalMultiplier = 1;
         flies.clear();
-
-
-        do {
+        
+        //loop for each turn of play
+        do
+        {
+            //increments game turn count
             Game.turns++;
             System.out.println("Turn: " + Game.turns);
 
             //update multiplier every 5th turn by 5%
-            if (turns % 10 == 0) {
+            if (turns % 10 == 0)
+            {
                 adjustConstants();
-            }
+            }//end of update modifier
 
             //update Web and Fly
             objectUpdate(spider, web, flies);
@@ -160,36 +173,46 @@ public class Game {
             //if alive, user can take turn
             if (!spider.alive())
                 action = QUIT_DEATH;
-            else {
+            //turn if spider is alive
+            else
+            {
                 spider.generateInformation();
                 spider.generateView(web);
                 action = getInput(spider, web);
-            }
+            }//end of user turn
+            
             //continue game (positive values are continues, allows for custom information)
-            if (action >= 0) {
+            if (action >= 0)
+            {
                 System.out.println("***********");
                 spider.update(flies);
-            }
+            }//end of continue game
+            
             //quit value encountered (any negative menu constants) (action < 0)
-            else {
+            else
+            {
                 displayText(action);
                 displayScore();
                 continueGame = false;
-            }
-        } while (continueGame);
-    }
+            }//end of quit game
+        }//end of do loop for each turn
+        while (continueGame);
+    }//end of gameController method
 
     /**
-     * Options menu, currently only contains the switch for debug mode
+     * The setOptions method switches debug method on or off
      */
-    private static void setOptions() {
+    private static void setOptions()
+    {
         String userInput;           //user keyboard input
 
         displayText(MENU_OPTIONS);
         System.out.print("#: ");
         userInput = keyboard.nextLine();
 
-        switch (userInput.toLowerCase()) {
+        //switch for changing debug option
+        switch (userInput.toLowerCase())
+        {
             case "1":
             case "debug":
                 DEBUG = !DEBUG;
@@ -198,24 +221,29 @@ public class Game {
             default:
                 System.out.println("Invalid Input");
                 break;
-        }
-    }
+        }//end of switch changing debug option
+    }//end of setOptions method
 
     /**
      * Menu for changing difficulty, currently only Easy, Medium, and Hard are available,
      * which influence the view distance of the spider (player). Harder difficulties have
      * higher final score multipliers
      */
-    private static void setDifficulty() {
+    private static void setDifficulty()
+    {
         String userInput;
         boolean cont = true;   //flag for user to continue
 
         displayText(MENU_DIFFICULTY);
-        do {
+        do
+        {
             System.out.print("Current Difficulty: " + Game.DIFFICULTY +
                     "\nInput: ");
             userInput = keyboard.nextLine();
-            switch (userInput.toLowerCase()) {
+            
+            //switch to set game difficulty
+            switch (userInput.toLowerCase())
+            {
                 //easy
                 case "1":
                 case "easy":
@@ -246,9 +274,10 @@ public class Game {
                 default:
                     System.out.println("Invalid input.");
                     break;
-            }
-        } while (cont); //user still wants to change difficulty
-    }
+            }//end of switch to set game difficulty
+        }//end of loop to ask for difficulty based on cont flag
+        while (cont); //user still wants to change difficulty
+    }//end of setDifficulty method
 
     /**
      * Checks to see what the command is. Can either be 1: quit, 2: help menu, or checks if valid movement
@@ -263,13 +292,18 @@ public class Game {
         String userInput;
         int action = 0;
         boolean valid = false;
-        do {
+        
+        //loop to get userInput for spider turn
+        do
+        {
             System.out.print("\nCommand: ");
             userInput = keyboard.nextLine();
 
             userInput = (userInput.toLowerCase()).trim();  //standardize input
 
-            switch (userInput) {
+            //switch for userInput: game exit, in-game help, or spider movement
+            switch (userInput)
+            {
                 //quit
                 case "quit":
                 case "exit":
@@ -283,24 +317,27 @@ public class Game {
                 //check if valid movement
                 default:
                     int[] newLocation = spider.getMovement(userInput, web);
-                    if (newLocation != null) {
+                    if (newLocation != null)
+                    {
                         spider.move(newLocation[0], newLocation[1]);
                         valid = true;
-                    }
+                    }//end of spider movement if
                     break;
-            }
-        } while (!valid);
+            }//end of userInput switch
+        }//end of loop for userInput spider turn
+        while (!valid);
         return action;
-    }
+    }//end of getInput method
 
     /**
      * Adjusts the game values as the game continues, increasing multipliers, and difficulties
      * called every X turns
      */
-    private static void adjustConstants() {
+    private static void adjustConstants()
+    {
         survivalMultiplier *= 1.025;
         Fly.adjustConstants();
-    }
+    }//end of adjustConstants method
 
     /**
      * updates the current objects excluding the player (Spider), can be adapted for more
@@ -309,10 +346,11 @@ public class Game {
      * @param web - Web object, used to update
      * @param flies - Fly ArrayList, passed to update web array elements
      */
-    private static void objectUpdate(Spider spider, Web web, ArrayList<Fly> flies) {
+    private static void objectUpdate(Spider spider, Web web, ArrayList<Fly> flies)
+    {
         Fly.update(web);
         web.update(spider, flies);
-    }
+    }//end of objectUpdate
 
     /**
      * Used to check if the String passed is a digit
@@ -320,26 +358,29 @@ public class Game {
      * @param value - String of random characters
      * @return true if the value is all 0-9, or false if not (includes non alpha characters like ',' or ' ')
      */
-    public static boolean isDigit(String value) {
+    public static boolean isDigit(String value)
+    {
         boolean isDigit = true;
         for (char c : value.toCharArray())
             if (!Character.isDigit(c))
                 isDigit = false;
         return isDigit;
-    }
+    }//end of isDigit method
 
     /**
      * changes the score by the parameter passed
      * @param adjust - amount of score change, can be positive or negative
      */
-    public static void adjustScore(int adjust) {
+    public static void adjustScore(int adjust)
+    {
         score += adjust;
-    }
+    }//end of adjustScore method
 
     /**
      * calculates and displays the score of the player after factoring in multipliers
      */
-    private static void displayScore() {
+    private static void displayScore()
+    {
         int survivalScore = (int) (turns * survivalMultiplier);
         score += survivalScore;
         score *= DIFFICULTY_MULTIPLIER;
@@ -353,15 +394,17 @@ public class Game {
                 "\n** Multiplier: " + DIFFICULTY_MULTIPLIER +
                 "\n**********************" +
                 "\nTOTAL SCORE: " + finalScore + "\n\n");
-    }
+    }//end of displayScore method
 
     /**
      * uses the value passed to display the relevant text
      * should only called with valid Game constants
      * @param value - A HELP, MENU, or QUIT constant from the top of Game
      */
-    private static void displayText(int value) {
-        switch (value) {
+    private static void displayText(int value)
+    {
+        switch (value)
+        {
             case QUIT_DEATH:
                 System.out.print("The Spider has died...\n\n");
                 break;
@@ -423,6 +466,6 @@ public class Game {
             default:
                 System.out.print("ERROR: displayText() incorrectly called\n");
                 break;
-        }
-    }
-}
+        }//end of switch for displayText
+    }//end of displayText method
+}//end of game class
