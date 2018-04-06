@@ -154,8 +154,6 @@ public class Game {
                 adjustConstants();
             }
 
-            Fly.getFlies().clear();
-
             //update Web and Fly
             objectUpdate(spider, web, flies);
 
