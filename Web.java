@@ -5,66 +5,76 @@ import java.util.ArrayList;
  * Fly currently in the web. The Spider uses this web to move around, and find Fly objects to eat. It is a
  * Square 2D array based of sizes 50, 100, 200, or 400.
  */
-public class Web {
+public class Web
+{
     private int[][] web;                //square web array of webLength length
     private int webLength;              //length of web array
 
     /**
+     * This constructor creates a new web based on input
      * @param x - diameter of the web
      */
-    public Web(int x) {
+    public Web(int x)
+    {
         webLength = x;
         web = new int[webLength][webLength];
-    }
+    }//end of Web constructor
 
     /**
-     * Checks if index sent is within the between 0 - (webLength - 1)
+     * The checkBounds method checks if index sent is within the between 0 - (webLength - 1)
      *
      * @param i - row of the web array
      * @param j - column of the web web array
      * @return if (i, j) is inside of the bounds of the web array
      */
-    public boolean checkBounds(int i, int j) {
+    public boolean checkBounds(int i, int j)
+    {
         return (0 <= i && 0 <= j) && (i < webLength && j < webLength);
-    }
+    }//end of checkBounds method
 
     /**
+     * The getWebLength method returns the size of the web
      * @return the diameter of the square web 2D array
      */
-    public int getWebLength() {
+    public int getWebLength()
+    {
         return webLength;
-    }
+    }//end of getWebLength method
 
     /**
+     * The getVibration method returns the value of vibration of element indexes
      * @param i - row of 2D array
      * @param j - column of 2D array
      * @return returns the vibration value of the 2D indexes passed
      */
-    public int getVibration(int i, int j) {
+    public int getVibration(int i, int j)
+    {
         return web[i][j];
-    }
+    }//end of getVibration method
 
     /**
-     * sets i, j to be the vibration value calculated in the calculateElements
+     * The setVibration method sets i, j to be the vibration value calculated in the calculateElements
      *
      * @param i         - Row of the index
      * @param j         - Col of the index
      * @param vibration - power of the vibration, higher values mean more vibrations
      */
-    private void setVibration(int i, int j, int vibration) {
+    private void setVibration(int i, int j, int vibration)
+    {
         if (vibration < 0)
             vibration = 0;    //vibration value
 
         web[i][j] = vibration;
-    }
+    }//end of setVibration method
 
     /**
-     * Takes a turn for the web, by updating the web on the new Fly locations
+     * The update method takes a turn for the web, by updating the web on the new Fly locations
      *
      * @param spider - Spider object, used for debugging to show spider location in web
      * @param flies  - ArrayList of the Fly objects, used to calculate the vibration values in each element
      */
-    public void update(Spider spider, ArrayList<Fly> flies) {
+    public void update(Spider spider, ArrayList<Fly> flies)
+    {
         //update the web vibration values
         calculateElements(flies);
 
@@ -72,13 +82,14 @@ public class Web {
         //shows entire web, can be slow to generate in webs larger than 50 (console is inefficient)
         if (Game.DEBUG)
             debug(spider);
-    }
+    }//end of update method
 
     /**
-     * calculates the value for each element in the web array by comparing all of the Fly objects
-     * in the flies array with one another. Whichever vibration is largest is set to be the element
+     * The calculateElements method calculates the value for each element in the web array by comparing all of the
+     * Fly objects in the flies array with one another. Whichever vibration is largest is set to be the element
      */
-    private void calculateElements(ArrayList<Fly> flies) {
+    private void calculateElements(ArrayList<Fly> flies)
+    {
         //define
         ArrayList<Integer> vibrateArray = new ArrayList<>(); //array of fly vibration at location
         int flyRow;               //current fly row
@@ -89,9 +100,15 @@ public class Web {
         //init
         int vibrateValue = 0;        //current vibration value for element
 
-        for (int i = 0; i < webLength; i++) {
-            for (int j = 0; j < webLength; j++) {
-                for (Fly fly : flies) {
+        //loop through web rows
+        for (int i = 0; i < webLength; i++)
+        {
+            //loop through web columns
+            for (int j = 0; j < webLength; j++)
+            {
+                //loop through flies in array
+                for (Fly fly : flies)
+                {
                     //get location and energy of specific fly
                     flyRow = fly.getRow();
                     flyCol = fly.getCol();
@@ -100,22 +117,24 @@ public class Web {
                     distance = getMaxDistance(i, j, flyRow, flyCol);
                     vibrateValue = flyEnergy - distance;      //power of vibration from fly to element
                     vibrateArray.add(vibrateValue);         //add vibration value to array
-                }
+                }//end of loop through flies in array
+                
                 //find greatest vibration value at this element, clears after running through
-                if (vibrateArray.size() > 0) {
+                if (vibrateArray.size() > 0)
+                {
                     for (int e : vibrateArray)
                         if (e > vibrateValue)
                             vibrateValue = e;
                     vibrateArray.clear();
-                }
+                }//end of finding greatest vibration at element
                 //update vibration
                 setVibration(i, j, vibrateValue);
-            }
-        }
-    }
+            }//end of loop through web columns
+        }//end of loop through web rows
+    }//end of calculateElements method
 
     /**
-     * Calculates the amount of elements between (i, j) and (x, y), including diagonals
+     * The getMaxDistance method calculates the amount of elements between (i, j) and (x, y), including diagonals
      *
      * @param i - Row of index
      * @param j - Column of index
@@ -123,19 +142,21 @@ public class Web {
      * @param y - column of element
      * @return the distance between two elements, any int < webLength
      */
-    private int getMaxDistance(int i, int j, int x, int y) {
+    private int getMaxDistance(int i, int j, int x, int y)
+    {
         int differenceX = Math.abs(x - i);        //difference in location row with current row 'i'
         int differenceY = Math.abs(y - j);        //difference in location column with current column 'j'
 
         return Math.max(differenceX, differenceY); //return which is larger, the row, or the column
-    }
+    }//end of getMaxDistance method
 
     /**
-     * displays the web, and the strength values of vibration.
+     * The debug method displays the web, and the strength values of vibration.
      *
      * @param spider - Spider object, used in showing the location of the spider in web
      */
-    private void debug(Spider spider) {
+    private void debug(Spider spider)
+    {
         int formatLength;   //dynamic web display formatter
 
         System.out.println("DEBUG: Web");
@@ -150,7 +171,9 @@ public class Web {
                 System.out.print(String.format("%-" + ((formatLength * 5) + 5) + "d", i));
         System.out.println();
 
-        for (int i = 0; i < webLength; i++) {
+        //loop to format and display web
+        for (int i = 0; i < webLength; i++)
+        {
             //formats row bars
             if (i % 5 == 0)
                 System.out.printf("%4d |", i);
@@ -158,16 +181,17 @@ public class Web {
                 System.out.printf("%4s |", "");
 
             //format what char to display in console
-            for (int j = 0; j < webLength; j++) {
+            for (int j = 0; j < webLength; j++)
+            {
                 if (spider.isSpider(i, j))
                     System.out.print(String.format("%-" + formatLength + "s ", "*"));
                 else if(Fly.getFly(i, j) != null)
                     System.out.print(String.format("%-" + formatLength + "s ",  "F"));
                 else
                     System.out.print(String.format("%-" + formatLength + "d ", getVibration(i, j)));
-            }
+            }//end of loop to display in console
             System.out.println();   //separate rows
-        }
+        }//end of loop to format and display web
         System.out.println();
-    }
-}
+    }//end of debug method
+}//end of Web class
