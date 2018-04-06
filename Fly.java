@@ -9,9 +9,9 @@ public class Fly {
     private static Random random = new Random();
     private static ArrayList<Fly> flies = new ArrayList<>();    //Fly array
 
-    private static int MAX_SMALL;       //maximum amount of small flies allowed in web
-    private static int MAX_MEDIUM;      //maximum amount of medium flies
-    private static int MAX_LARGE;       //maximum amount of large flies
+    private static double MAX_SMALL;       //maximum amount of small flies allowed in web
+    private static double MAX_MEDIUM;      //maximum amount of medium flies
+    private static double MAX_LARGE;       //maximum amount of large flies
     private static int currentSmall;    //current small flies
     private static int currentMedium;   //current medium flies
     private static int currentLarge;    //current large flies
@@ -31,7 +31,7 @@ public class Fly {
         locationRow = locationRow_;                     //new (i) coordinate
         locationCol = locationCol_;                     //new (j) coordinate
         size = size_;                                   //FlySize
-        vibrateEnergy = (size.ordinal() + 1) * 5;       //vibrate more the larger the size
+        vibrateEnergy = (size.ordinal() + 1) * 5;       //vibrate more the larger the size (10, 15, 20)
         foodValue = (size.ordinal() + 1) * 2;           //For each size, give 2 health when eaten
         scoreValue = (size.ordinal()+ 1) * 5;           //for each size, give 5 score when eaten
     }
@@ -63,9 +63,20 @@ public class Fly {
         //number of 50x50 quadrants in web
         int numberQuadrants = (int) Math.pow((webSize / 50), 2);
 
-        MAX_SMALL = (int) (5.5 * numberQuadrants);
+        MAX_SMALL = (int) (6.5 * numberQuadrants);
         MAX_MEDIUM = (int) (3.33 * numberQuadrants);
         MAX_LARGE = (int) (1.2 * numberQuadrants);
+    }
+
+    /**
+     * setup adjust variables each turn, the game regenerates less flies as it continues
+     */
+    public static void adjustConstants() {
+        double reductionConstant = .95;
+
+        MAX_SMALL *= reductionConstant;
+        MAX_MEDIUM *= reductionConstant;
+        MAX_LARGE *= reductionConstant;
     }
 
     /**

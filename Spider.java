@@ -103,11 +103,24 @@ public class Spider
     }//end of isSpider method
 
     /**
-     * The generateInformation method displays the spider's life and max Movement
+     * The generateInformation method displays the spider's life
     */
     public void generateInformation()
     {
-        System.out.printf("Health: %d, Movement: %d%n", life, MAX_MOVEMENT);
+        int maxDisplay = 9;     //max '@' to display for health
+        double lifePercent = (double) life / MAX_LIFE;
+        StringBuilder displayLife = new StringBuilder("");
+
+        for (int i = 0; i < maxDisplay; i++)
+        {
+            if (lifePercent > 0.0)
+            {
+                displayLife.append("@");
+                lifePercent -= (double) 1 / maxDisplay;
+            }//end of if life <0
+        }//end of for loop
+
+        System.out.printf("Life: %s%n", displayLife);
     }//end of generateInformation method
 
     /**
@@ -350,10 +363,11 @@ public class Spider
                 currentCol = locationCol + changeCol;
 
                 if (i == viewRadius && j == viewRadius)
-                    System.out.print("    *    ");
+                    System.out.print("   *   ");
                 else
-                    System.out.printf(" %3d,%3d ", currentRow, currentCol);
+                    System.out.printf("%3d,%-3d", currentRow, currentCol);
             }//end of column loop
+
             System.out.println();
         }//end of row loop
     }//end of debug method

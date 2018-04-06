@@ -11,7 +11,7 @@ v1.0.2
         - score update to give more for larger flies
     - General cleanup
 
-v.1.1.0
+v1.1.0
     - New game-play style
         - Max flies dependent on array size
             - for every 50x50 section (100x100 has 4 of them)
@@ -25,3 +25,7 @@ v.1.1.0
     - removed hunger and health, too many different things were needing to be adjusted
     after game-play rework
     - score menu rework, shows more information
+
+v1.1.1
+    - Game becomes more difficult as it continues
+    - removed rest of fly survival behavior (health, hunger)
